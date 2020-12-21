@@ -1,4 +1,3 @@
-# -- coding: utf-8 --
 import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt
@@ -111,7 +110,8 @@ class spectrum:
         ax2 = fig.add_subplot(312)
         ax3 = fig.add_subplot(313)
 
-        ax1.set_title(self.header['code']+" "+self.header['record_time'])
+        if 'code' in self.header and 'record_time' in self.header:
+            ax1.set_title(self.header['code']+" "+self.header['record_time'])
 
         ax1.plot(self.freq,10*np.log10(np.abs(self.ew)),color='k',lw=1)
         ax2.plot(self.freq,10*np.log10(np.abs(self.ns)),color='k',lw=1)
@@ -253,9 +253,44 @@ class spectrum_list:
 
             self.ave = s.smoothing(window)
 
+    def statistics_horizontal(self,nw=12):
+        n = len(self.sr)
+        stat_freq_bounds = np.logspace(-1,1.2,nw)
+        stat_freq_width = np.diff(stat_freq_bounds)
+        self.stat_freq = (stat_freq_bounds[0:-2] + stat_freq_bounds[1:-1])/2
+
+        freq_window = []
+        for i,fc in enumerate(self.stat_freq):
+            freq_window += [np.where((self.freq > stat_freq_bounds[i]) & (self.freq < stat_freq_bounds[i+1]))]
+
+        samples = [[] for i in range(len(self.stat_freq))]
+        for s in self.sr:
+            for i,fc in enumerate(self.stat_freq):
+                try:
+                    samples[i] = np.append(samples[i],[s.ew[freq_window[i]],s.ns[freq_window[i]]])
+                except:
+                    samples[i] = np.append(s.ew[freq_window[i]],s.ns[freq_window[i]])
+
+        self.mean = []
+        self.mean_nstd,self.mean_pstd = [],[]
+        for sample_data in samples:
+            m = np.mean(np.log10(sample_data))
+            std = np.std(np.log10(sample_data),ddof=1)
+
+            self.mean += [10**m]
+            self.mean_pstd += [10**(m+std)]
+            self.mean_nstd += [10**(m-std)]
+
+
     def output_average(self,output_file,fmt="%15.7f"):
         header = str(self.header)
         output = np.c_[self.freq,self.ave.ew,self.ave.ns,self.ave.ud]
+        np.savetxt(output_file,output,fmt=fmt,header=header,comments="#")
+
+
+    def output_statistics(self,output_file,fmt="%15.7f"):
+        header = str(self.header)
+        output = np.c_[self.stat_freq,self.mean,self.mean_nstd,self.mean_pstd]
         np.savetxt(output_file,output,fmt=fmt,header=header,comments="#")
 
 
@@ -295,9 +330,9 @@ class spectrum_list:
         ax2.set_yscale("log")
         ax3.set_yscale("log")
 
-        ax1.set_ylim(0.01,100)
-        ax2.set_ylim(0.01,100)
-        ax3.set_ylim(0.01,100)
+        # ax1.set_ylim(0.01,100)
+        # ax2.set_ylim(0.01,100)
+        # ax3.set_ylim(0.01,100)
 
         ax3.set_xlabel("frequency [Hz]")
 

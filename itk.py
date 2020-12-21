@@ -1,4 +1,3 @@
-# -- coding: utf-8 --
 import struct
 import datetime
 import numpy as np
@@ -11,6 +10,14 @@ def parse(input_dir,file_basename,start_time,end_time, \
 
     i = itk()
     i.parse(input_dir,file_basename,start_time,end_time,fmt,sc)
+    v = i.to_vectors()
+
+    return v
+
+def parse_SD(input_dir,start_time,end_time,fmt='%Y%m%d%H%M',sc=2.5*980/(2.0**23)):
+
+    i = itk()
+    i.parse_SD(input_dir,start_time,end_time,fmt,sc)
     v = i.to_vectors()
 
     return v
@@ -31,7 +38,6 @@ class itk:
 
     ### Parse ITK data ###
     def parse(self,input_dir,file_basename,start_time,end_time,fmt,sc):
-
         st = datetime.datetime.strptime(start_time,fmt)
         et = datetime.datetime.strptime(end_time,fmt)
         m = (et-st).seconds // 60 + 1
@@ -55,6 +61,30 @@ class itk:
 
         self.read_itk_data(st,datalines_list,sc)
 
+
+    def parse_SD(self,input_dir,start_time,end_time,fmt,sc):
+        st = datetime.datetime.strptime(start_time,fmt)
+        et = datetime.datetime.strptime(end_time,fmt)
+        m = (et-st).seconds // 60 + 1
+
+        datalines_list = []
+        for im in range(0,m):
+            ct = st + datetime.timedelta(minutes=im)
+            current_time = ct.strftime('%M')
+            file_name = input_dir + current_time + ".RAW"
+
+            try:
+                itk_file = open(file_name,'rb')
+                try:
+                    datalines = itk_file.read()
+                    datalines_list += [datalines]
+                finally:
+                    itk_file.close()
+
+            except IOError as e:
+                print("File IO Error: ",e.strerror)
+
+        self.read_itk_data(st,datalines_list,sc)
 
     # --------------------------------------------------------------------------- #
     #   Parse related methods

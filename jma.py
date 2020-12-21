@@ -1,7 +1,7 @@
 import numpy as np
+import datetime
 from . import vector
 import sys
-
 
 #/ Parse function set /#
 def parse(file_name):
@@ -203,12 +203,14 @@ class jma:
 
         return i0, {str(nc):data_list}
 
-
+#------------------------------------------------------------#
     def read_jma_csv_data(self,datalines,file_name):
 
         code = datalines[0][11:-1].replace(' ','')
 #        record_time = file_name[-22:-8]
         record_time = datalines[5][14:].strip()
+        parse_time = datetime.datetime.strptime(record_time,"%Y %m %d %H %M %S")
+        record_time = parse_time.strftime('%Y/%m/%d %H:%M:%S')
 
         slat = datalines[1][-8:]
         slon = datalines[2][-9:]

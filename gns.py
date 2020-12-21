@@ -20,24 +20,18 @@ class gns:
     #   Convert to vectors class
     # --------------------------------------------------------------------------- #
     def to_vectors(self):
-
         v = vector.vectors(self.header,self.tim,self.ew,self.ns,self.ud)
         return v
 
-
     ### Parse JMA data ###
     def parse(self,file_name):
-
         try:
             file = open(file_name)
-
             try:
                 datalines = file.readlines()
                 self.read_gns_data(datalines,file_name)
-
             finally:
                 file.close()
-
         except IOError as e:
             print("File IO Error: ",e.strerror)
 
@@ -45,17 +39,16 @@ class gns:
     #   Parse related methods
     # --------------------------------------------------------------------------- #
     def read_gns_data(self,datalines,file_name):
-
-        code = file_name.strip().split("_")[-2]
+#        code = file_name.strip().split("_")[-2]
 
         nline = 0
-        record_time,lat,lon,dt,rot1,ndat,ndat_acc = self.read_header(datalines,nline)
-        ns_body,nline = self.read_body(datalines,nline,ndat,ndat_acc)
-
-        record_time,lat,lon,dt,rot2,ndat,ndat_acc = self.read_header(datalines,nline)
+        code,record_time,lat,lon,dt,rot1,ndat,ndat_acc = self.read_header(datalines,nline)
         ew_body,nline = self.read_body(datalines,nline,ndat,ndat_acc)
 
-        record_time,lat,lon,dt,rot3,ndat,ndat_acc = self.read_header(datalines,nline)
+        _,record_time,lat,lon,dt,rot2,ndat,ndat_acc = self.read_header(datalines,nline)
+        ns_body,nline = self.read_body(datalines,nline,ndat,ndat_acc)
+
+        _,record_time,lat,lon,dt,rot3,ndat,ndat_acc = self.read_header(datalines,nline)
         ud_body,nline = self.read_body(datalines,nline,ndat,ndat_acc)
 
         ntim = ndat_acc
@@ -71,6 +64,7 @@ class gns:
         self.tim = np.linspace(0.0,dt*ntim,ntim,endpoint=False)
 
     def read_header(self,datalines,nline):
+        code = datalines[nline+1].strip().split()[1]
 
         list0 = datalines[nline+16].strip().split()
         list1 = datalines[nline+17].strip().split()
@@ -90,18 +84,15 @@ class gns:
         listf = datalines[nline+22].strip().split()
         dt = float(listf[5])
 
-        return record_time,lat,lon,dt,rot,ndat,ndat_acc
+        return code,record_time,lat,lon,dt,rot,ndat,ndat_acc
 
     def read_body(self,datalines,nline,ndat,ndat_acc):
 
         w = []
         for line in datalines[nline+26:]:
-            lists = line.strip().split()
-
-            for l in lists:
-                w.append(float(l))
-
+            lists = [float(line[i:i+8]) for i in range(0,len(line)-1,8)]
+            w += lists
             if len(w) >= ndat_acc:
                 break
 
-        return w, nline+27+int((ndat-1)/10)
+        return w, nline+27+int((ndat_acc-1)/10)

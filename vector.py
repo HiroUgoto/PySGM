@@ -1,8 +1,8 @@
-# -- coding: utf-8 --
 import numpy as np
 from scipy import signal
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
+import datetime
 import math
 import copy
 import sys
@@ -10,6 +10,7 @@ import sys
 from . import response
 from . import spectrum
 from . import jsi
+from . import realtime_jsi
 
 #/ Parse function sets /#
 def parse(input_file,noheader=False):
@@ -27,6 +28,9 @@ class vector:
         self.wave = wave
         self.dt = tim[1] - tim[0]
 
+    def copy(self):
+        v2 = copy.deepcopy(self)
+        return v2
 
     #----------------------------------------------#
     #  Wave Analysis
@@ -110,6 +114,26 @@ class vector:
         wave_int = np.real(np.fft.ifft(w2))
         return wave_int
 
+    def bandpass_butter(wave,dt,low,high,order=5):
+        fs = 1.0/dt
+        nyq = 0.5*fs
+        low_cut = low/nyq
+        high_cut = high/nyq
+        b,a = signal.butter(order,[low_cut,high_cut],btype='band')
+        wave2 = signal.lfilter(b,a,wave)
+        return wave2
+
+    def envelope_vector(wave):
+        wave_ana = signal.hilbert(wave)
+        wave_env = np.abs(wave_ana)
+        return wave_env
+
+    def envelope(self):
+        v2 = copy.deepcopy(self)
+        wave_ana = signal.hilbert(self.wave)
+        v2.wave = np.abs(wave_ana)
+        return v2
+
     def power_spectrum(wave,fs):
         freq, P = signal.periodogram(wave,fs)
         return freq, P
@@ -137,6 +161,10 @@ class vector:
 
         return PG
 
+    def normalize(wave,scale=1.0):
+        PG = math.sqrt(np.max(wave**2))
+        return wave/PG*scale
+
     def roll(self,shift):
         nshift = int(shift/self.dt)
         v2 = copy.deepcopy(self)
@@ -152,6 +180,30 @@ class vector:
         v2 = copy.deepcopy(self)
         v2.wave += v1.wave
         return v2
+
+    def extract(self,start,end):
+        ns = int(start/self.dt)
+        ne = int(end/self.dt)
+        ntim = ne-ns
+        v2 = copy.deepcopy(self)
+        v2.wave = self.wave[ns:ne]
+        v2.tim = self.tim[ns:ne]
+        v2.header['ntim'] = ntim
+        return v2
+
+    #----------------------------------------------#
+    #  Residual functions
+    #----------------------------------------------#
+    def nonlinear_residual(self,v):
+        v0 = np.sum(self.wave**2)
+        v1 = np.sum(v.wave**2)
+        v01 = np.sum((self.wave-v.wave)**2)
+        return v01*v01/v0/v1
+
+    def linear_residual(self,v):
+        v0 = np.sum(self.wave**2)
+        v01 = np.sum((self.wave-v.wave)**2)
+        return v01/v0
 
     #----------------------------------------------#
     #  Plot functions
@@ -185,6 +237,39 @@ class vector:
         plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0, hspace=0)
         plt.show()
 
+    def plot_with(self,v):
+        start = self.tim[0]
+        end = min(self.tim[-1],v.tim[-1])
+
+        ns = 0
+        ne = int((end-start)/self.dt)
+
+        fig = plt.figure()
+
+        plt.rcParams['xtick.direction'] = 'in'
+        plt.rcParams['ytick.direction'] = 'in'
+
+        ax1 = fig.add_subplot(211)
+        ax2 = fig.add_subplot(212)
+
+        if 'code' in self.header and 'record_time' in self.header:
+            ax1.set_title(self.header['code']+" "+self.header['record_time'])
+
+        ax1.plot(self.tim,self.wave,color='k',lw=1)
+        ax2.plot(v.tim,v.wave,color='r',lw=1)
+
+        amax = np.amax(np.abs(self.wave[ns:ne]))
+
+        ax1.set_xlim(start,end)
+        ax2.set_xlim(start,end)
+
+        ax1.set_ylim(-1.2*amax,1.2*amax)
+        ax2.set_ylim(-1.2*amax,1.2*amax)
+
+        ax2.set_xlabel("time [s]")
+
+        plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0, hspace=0)
+        plt.show()
 
 #######################################
 ##          Vectors   class          ##
@@ -198,6 +283,10 @@ class vectors(vector):
         self.ns = ns
         self.ud = ud
         self.dt = tim[1] - tim[0]
+
+    def copy(self):
+        v2 = copy.deepcopy(self)
+        return v2
 
     #----------------------------------------------#
     #  Construction functions
@@ -275,17 +364,24 @@ class vectors(vector):
 
     def time_shift(self,shift):
         nshift = int(shift/self.dt)
-
         v2 = copy.deepcopy(self)
-        v2.ew = self.ew[nshift:]
-        v2.ns = self.ns[nshift:]
-        v2.ud = self.ud[nshift:]
+        v2.ew = np.roll(self.ew,-nshift)
+        v2.ns = np.roll(self.ns,-nshift)
+        v2.ud = np.roll(self.ud,-nshift)
+        return v2
 
-        ntim = len(v2.ew)
-        dt = self.tim[1] - self.tim[0]
-        v2.tim = np.linspace(0,ntim*dt,ntim,endpoint=False)
-        v2.header['ntim'] = ntim
+    def normalize(self,scale=1.0):
+        v2 = copy.deepcopy(self)
+        v2.ew = vector.normalize(self.ew,scale)
+        v2.ns = vector.normalize(self.ns,scale)
+        v2.ud = vector.normalize(self.ud,scale)
+        return v2
 
+    def level_shift(self,level):
+        v2 = copy.deepcopy(self)
+        v2.ew = self.ew + level
+        v2.ns = self.ns + level
+        v2.ud = self.ud + level
         return v2
 
     def trim(self,ntim):
@@ -335,6 +431,22 @@ class vectors(vector):
         v2.ud = self.ud*amp
         return v2
 
+    def extract(self,start,end=60,to_end=True):
+        ns = int(start/self.dt)
+        if to_end:
+            ne = self.header['ntim']
+        else:
+            ne = int(end/self.dt)
+        ntim = ne-ns
+
+        v2 = copy.deepcopy(self)
+        v2.ew = self.ew[ns:ne]
+        v2.ns = self.ns[ns:ne]
+        v2.ud = self.ud[ns:ne]
+        v2.tim = self.tim[ns:ne]
+        v2.header['ntim'] = ntim
+        return v2
+
     #----------------------------------------------#
     #  Wave Analysis
     #----------------------------------------------#
@@ -360,6 +472,20 @@ class vectors(vector):
         v2.ns = vector.bandpass(self.ns,self.dt,low,high)
         v2.ud = vector.bandpass(self.ud,self.dt,low,high)
 
+        return v2
+
+    def bandpass_butter(self,low=0.05,high=10,order=5):
+        v2 = copy.deepcopy(self)
+        v2.ew = vector.bandpass_butter(self.ew,self.dt,low,high,order)
+        v2.ns = vector.bandpass_butter(self.ns,self.dt,low,high,order)
+        v2.ud = vector.bandpass_butter(self.ud,self.dt,low,high,order)
+        return v2
+
+    def envelope(self):
+        v2 = copy.deepcopy(self)
+        v2.ew = vector.envelope_vector(self.ew)
+        v2.ns = vector.envelope_vector(self.ns)
+        v2.ud = vector.envelope_vector(self.ud)
         return v2
 
     def power_spectrum(self):
@@ -394,8 +520,6 @@ class vectors(vector):
         freq, Pew = vector.power_spectrum(self.ew,fs)
         freq, Pns = vector.power_spectrum(self.ns,fs)
         freq, Pud = vector.power_spectrum(self.ud,fs)
-
-        ps = spectrum.spectrum(self.header,freq,Pew,Pns,Pud)
 
         nf = min(len(freq),len(ps0.freq))
 
@@ -463,6 +587,10 @@ class vectors(vector):
             print("JMA Seismic Intensity: ", si)
 
         return si
+
+    def realtime_seismic_intensity(self):
+        rsi = realtime_jsi.realtime_jsi(self.ew,self.ns,self.ud,self.dt)
+        return rsi
 
     def peak_period_Sv(self):
         period = np.logspace(-1,1,100)
@@ -596,10 +724,13 @@ class vectors(vector):
     def plot_all(self,start=0,end=60,to_end=False):
 
         if to_end:
+            start = self.tim[0]
             end = self.tim[-1]
-
-        ns = int(start/self.dt)
-        ne = int(end/self.dt)
+            amax = np.amax(np.r_[np.abs(self.ew),np.abs(self.ns),np.abs(self.ud)])
+        else:
+            ns = int(start/self.dt)
+            ne = int(end/self.dt)
+            amax = np.amax(np.r_[np.abs(self.ew[ns:ne]),np.abs(self.ns[ns:ne]),np.abs(self.ud[ns:ne])])
 
         fig = plt.figure()
 
@@ -613,11 +744,12 @@ class vectors(vector):
         if 'code' in self.header and 'record_time' in self.header:
             ax1.set_title(self.header['code']+" "+self.header['record_time'])
 
+
         ax1.plot(self.tim,self.ew,color='k',lw=1)
         ax2.plot(self.tim,self.ns,color='k',lw=1)
         ax3.plot(self.tim,self.ud,color='k',lw=1)
 
-        amax = np.amax(np.r_[np.abs(self.ew[ns:ne]),np.abs(self.ns[ns:ne]),np.abs(self.ud[ns:ne])])
+
 
         ax1.set_xlim(start,end)
         ax2.set_xlim(start,end)

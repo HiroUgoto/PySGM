@@ -1,6 +1,7 @@
-# -- coding: utf-8 --
 import numpy as np
+import datetime
 from . import vector
+
 
 #/ Parse function sets /#
 def knet_parse(file_basename):
@@ -139,8 +140,11 @@ class nied:
 
         ntim = len(ew_body)
 
+        trigger_time = datetime.datetime.strptime(ew_header['record_time'],"%Y/%m/%d %H:%M:%S")
+        record_time = trigger_time - datetime.timedelta(seconds=15)
+
         self.header = {'code':ew_header['code'],
-                       'record_time':ew_header['record_time'],
+                       'record_time':record_time.strftime('%Y/%m/%d %H:%M:%S'),
                        'lat':ew_header['lat'],'lon':ew_header['lon'],
                        'ntim':ntim}
 
