@@ -12,10 +12,10 @@ def parse(file_name):
 
     return v
 
-def csv_parse(file_name):
+def csv_parse(file_name,fmt=','):
 
     j = jma()
-    j.csv_parse(file_name)
+    j.csv_parse(file_name,fmt)
     v = j.to_vectors()
 
     return v
@@ -52,21 +52,20 @@ class jma:
             print("File IO Error: ",e.strerror)
 
 
-    def csv_parse(self,file_name):
+    def csv_parse(self,file_name,fmt=','):
 
         try:
             jma_file = open(file_name, encoding='shift_jis')
 
             try:
                 datalines = jma_file.readlines()
-                self.read_jma_csv_data(datalines,file_name)
+                self.read_jma_csv_data(datalines,file_name,fmt)
 
             finally:
                 jma_file.close()
 
         except IOError as e:
             print("File IO Error: ",e.strerror)
-
 
     # --------------------------------------------------------------------------- #
     #   Parse related methods
@@ -204,11 +203,11 @@ class jma:
         return i0, {str(nc):data_list}
 
 #------------------------------------------------------------#
-    def read_jma_csv_data(self,datalines,file_name):
+    def read_jma_csv_data(self,datalines,file_name,fmt=','):
 
         code = datalines[0][11:-1].replace(' ','')
 #        record_time = file_name[-22:-8]
-        record_time = datalines[5][14:].strip()
+        record_time = datalines[5][14:35].strip()
         parse_time = datetime.datetime.strptime(record_time,"%Y %m %d %H %M %S")
         record_time = parse_time.strftime('%Y/%m/%d %H:%M:%S')
 
@@ -218,7 +217,7 @@ class jma:
         lat = float(slat)
         lon = float(slon)
 
-        ew_body,ns_body,ud_body = self.read_csv_body(datalines)
+        ew_body,ns_body,ud_body = self.read_csv_body(datalines,fmt)
 
         self.ew = np.array(ew_body)
         self.ns = np.array(ns_body)
@@ -234,15 +233,14 @@ class jma:
         self.tim = np.linspace(0.0,0.01*ntim,ntim,endpoint=False)
 
 
-    def read_csv_body(self,datalines):
+    def read_csv_body(self,datalines,fmt=','):
 
         ew = []
         ns = []
         ud = []
 
         for line in datalines[7:]:
-            lists = line.strip().split(',')
-#            lists = line.strip().split()
+            lists = line.strip().split(fmt)
 
             ns.append(float(lists[0]))
             ew.append(float(lists[1]))

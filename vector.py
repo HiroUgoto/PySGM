@@ -548,6 +548,12 @@ class vectors(vector):
 
         return peak_pSv, peak_period
 
+    def response_spectrum_peak_period_psv(self):
+        self.period = np.logspace(-1,1,100)
+        pSv,peak_pSv,peak_period = response.response_spectrum_pseudo(self.ew,self.ns,self.period,self.dt)
+
+        return peak_pSv, peak_period
+
     def calc_SI(self):
         SI = response.calc_SI(self.ew,self.ns,self.dt)
         return SI
@@ -593,19 +599,10 @@ class vectors(vector):
         return rsi
 
     def peak_period_Sv(self):
-        period = np.logspace(-1,1,100)
-        rot_list = np.linspace(0,180,num=8)
-        Sv_max = 0.0
+        self.period = np.logspace(-1,1,100)
+        peak_Sv,peak_period = response.response_spectrum_peak_period_sv(self.ew,self.ns,self.period,self.dt)
 
-        for rot in rot_list:
-            w = self.rotation(rot)
-            Sa, Sv, Sd = response.response_spectrum(w.ns,period,self.dt)
-
-            if Sv_max < np.max(Sv):
-                Sv_max = np.max(Sv)
-                peak_period = period[np.argmax(Sv)]
-
-        return peak_period, Sv_max
+        return peak_Sv, peak_period
 
     def hv_spectrum(self,nt=4096,start=60,ncut=10,window=0.2):
 

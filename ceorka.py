@@ -70,7 +70,7 @@ class ceorka:
 
         lists = datalines[0].strip().split()
         ndat = int(lists[0])
-        nline_ns = int(ndat / 10) + 1
+        nline_ns = (ndat-1)//10 + 1
         sf_ns = float(datalines[0][40:48])
         rot = int(lists[6][1:4])
 
@@ -81,26 +81,25 @@ class ceorka:
             for w in lists:
                 ns.append(float(w) * sf_ns)
 
-
-        lists = datalines[nline_ns].strip().split()
+        lists = datalines[1+nline_ns].strip().split()
         ndat = int(lists[0])
-        nline_ew = int(ndat / 10) + 1
-        sf_ew = float(datalines[nline_ns][40:48])
+        nline_ew = (ndat-1)//10 + 1
+        sf_ew = float(datalines[1+nline_ns][40:48])
 
         ew = []
-        for line in datalines[nline_ns+1:nline_ns+nline_ew]:
+        for line in datalines[2+nline_ns:1+nline_ns+nline_ew]:
             s = line.rstrip()
             lists = [s[i: i+8] for i in range(0, len(line)-1, 8)]
             for w in lists:
                 ew.append(float(w) * sf_ew)
 
-        lists = datalines[nline_ns+nline_ew].strip().split()
+        lists = datalines[2+nline_ns+nline_ew].strip().split()
         ndat = int(lists[0])
-        nline = int(ndat / 10)
-        sf_ud = float(datalines[nline_ns+nline_ew][40:48])
+        nline = (ndat-1)//10 + 1
+        sf_ud = float(datalines[2+nline_ns+nline_ew][40:48])
 
         ud = []
-        for line in datalines[nline_ns+nline_ew+1:]:
+        for line in datalines[3+nline_ns+nline_ew:-1]:
             s = line.rstrip()
             lists = [s[i: i+8] for i in range(0, len(line)-1, 8)]
             for w in lists:
