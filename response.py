@@ -1,4 +1,3 @@
-# -- coding: utf-8 --
 import numpy as np
 import matplotlib.pyplot as plt
 import math
@@ -53,6 +52,28 @@ def response_spectrum_pseudo(ew,ns,period,dt):
     peak_period = period[peak_index]
 
     return np.array(psv_list),peak_psv,peak_period
+
+@jit
+def response_spectrum_peak_period_sv(ew,ns,period,dt):
+    ntim = min(len(ew),30000)
+    sv_list = []
+
+    for p in period:
+        sv = 0.0
+
+        acc_ew, vel_ew, disp_ew = response_1dof_full(ew[0:ntim],p,dt)
+        acc_ns, vel_ns, disp_ns = response_1dof_full(ns[0:ntim],p,dt)
+
+        vel_index = np.argmax(vel_ew**2 + vel_ns**2)
+        sv = math.sqrt(vel_ew[vel_index]**2 + vel_ns[vel_index]**2)
+
+        sv_list += [sv]
+
+    peak_index = np.argmax(np.array(sv_list))
+    peak = sv_list[peak_index]
+    peak_period = period[peak_index]
+
+    return peak,peak_period
 
 @jit
 def response_spectrum_max(ew,ns,period,dt):
@@ -211,3 +232,29 @@ def response_1dof_full(wave,period,dt,h=0.05):
         disp_list += [disp1]
 
     return np.array(acc_list), np.array(vel_list), np.array(disp_list)
+
+def response_1dof_full_FD(wave,period,dt,h=0.05):
+    n = len(wave)
+    w = np.fft.fft(wave)/(n/2)
+    freq = np.fft.fftfreq(len(wave),d=dt)
+    omega0 = 2*np.pi/period
+
+    acc_FD = np.zeros_like(w)
+    vel_FD = np.zeros_like(w)
+    disp_FD = np.zeros_like(w)
+    for (i,f) in enumerate(freq):
+        if f > 0.0:
+            omega = 2.0*np.pi*f
+            img = 0.0 + 1.0j
+            resp = omega**2 / (-omega**2 + 2*img*h*omega0*omega + omega0**2)
+            coef = img*omega
+
+            acc_FD[i] = w[i] * resp
+            vel_FD[i] = acc_FD[i] / coef
+            disp_FD[i] = vel_FD[i] / coef
+
+    acc = np.real(np.fft.ifft(acc_FD))*n
+    vel = np.real(np.fft.ifft(vel_FD))*n
+    disp = np.real(np.fft.ifft(disp_FD))*n
+
+    return acc+wave, vel, disp

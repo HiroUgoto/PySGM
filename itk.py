@@ -46,7 +46,7 @@ class itk:
         for im in range(0,m):
             ct = st + datetime.timedelta(minutes=im)
             current_time = ct.strftime('%Y%m%d%H%M')
-            file_name = input_dir + current_time + "_" + file_basename + ".raw"
+            file_name = input_dir + "/" + current_time + "_" + file_basename + ".raw"
 
             try:
                 itk_file = open(file_name,'rb')
@@ -70,8 +70,8 @@ class itk:
         datalines_list = []
         for im in range(0,m):
             ct = st + datetime.timedelta(minutes=im)
-            current_time = ct.strftime('%M')
-            file_name = input_dir + current_time + ".RAW"
+            current_time = ct.strftime('%Y/%m/%d/%H/%M')
+            file_name = input_dir + "/DATA/" + current_time + ".RAW"
 
             try:
                 itk_file = open(file_name,'rb')
