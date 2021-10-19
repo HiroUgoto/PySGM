@@ -192,6 +192,32 @@ class vector:
         return v2
 
     #----------------------------------------------#
+    def coherence(self,wave,window):
+        freq,f0 = vector.fourier_spectrum(self.wave,1/self.dt)
+        freq,f1 = vector.fourier_spectrum(wave.wave,1/self.dt)
+
+        p0 = np.conjugate(f0)*f0
+        p1 = np.conjugate(f1)*f1
+        c01 = np.conjugate(f0)*f1
+
+        nw = int(window/(freq[1]-freq[0]))
+        if nw%2 == 0:
+            nw += 1
+        nw2 = int((nw-1)/2)
+        w = signal.parzen(nw)
+        a = np.r_[c01[nw2:0:-1],c01,c01[0],c01[-1:-nw2:-1]]
+        c01_s = np.convolve(w/w.sum(),a,mode='valid')
+
+        a = np.r_[p0[nw2:0:-1],p0,p0[0],p0[-1:-nw2:-1]]
+        p0_s = np.convolve(w/w.sum(),a,mode='valid')
+        a = np.r_[p1[nw2:0:-1],p1,p1[0],p1[-1:-nw2:-1]]
+        p1_s = np.convolve(w/w.sum(),a,mode='valid')
+
+        c01_abs = np.conjugate(c01_s)*c01_s
+
+        return freq, c01_abs/(p0_s*p1_s)
+
+    #----------------------------------------------#
     #  Residual functions
     #----------------------------------------------#
     def nonlinear_residual(self,v):
@@ -255,8 +281,8 @@ class vector:
         if 'code' in self.header and 'record_time' in self.header:
             ax1.set_title(self.header['code']+" "+self.header['record_time'])
 
-        ax1.plot(self.tim,self.wave,color='k',lw=1)
-        ax2.plot(v.tim,v.wave,color='r',lw=1)
+        ax1.plot(self.tim,self.wave,color='b',lw=1)
+        ax2.plot(v.tim,v.wave,color='k',lw=1)
 
         amax = np.amax(np.abs(self.wave[ns:ne]))
 
@@ -874,4 +900,4 @@ class vectors(vector):
         plt.show()
 
     def plot_ps_all(self):
-        self.ps.plot_all()
+        self.ps.plot_ps_all()
