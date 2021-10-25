@@ -164,9 +164,9 @@ class spectrum:
         ax2.set_xlim(0.05,50)
         ax3.set_xlim(0.05,50)
 
-#        ax1.set_ylim(-150,0)
-#        ax2.set_ylim(-150,0)
-#        ax3.set_ylim(-150,0)
+        ax1.set_ylim(-150,0)
+        ax2.set_ylim(-150,0)
+        ax3.set_ylim(-150,0)
 
 #        ax1.set_ylim(-100,50)
 #        ax2.set_ylim(-100,50)

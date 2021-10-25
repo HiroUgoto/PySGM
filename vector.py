@@ -205,6 +205,7 @@ class vector:
             nw += 1
         nw2 = int((nw-1)/2)
         w = signal.parzen(nw)
+        
         a = np.r_[c01[nw2:0:-1],c01,c01[0],c01[-1:-nw2:-1]]
         c01_s = np.convolve(w/w.sum(),a,mode='valid')
 
