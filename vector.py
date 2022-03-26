@@ -48,7 +48,7 @@ class vector:
         for (i,f) in enumerate(freq):
             coef = (0.0+1.0j)*2.0*math.pi*f
 
-            if abs(f) < low0:
+            if abs(f) <= low0:
                 w2[i] = 0.0 + 0.0j
             elif abs(f) < low:
                 w2[i] = w[i] * (abs(f)-low0)/(low-low0) / coef
@@ -205,7 +205,7 @@ class vector:
             nw += 1
         nw2 = int((nw-1)/2)
         w = signal.parzen(nw)
-        
+
         a = np.r_[c01[nw2:0:-1],c01,c01[0],c01[-1:-nw2:-1]]
         c01_s = np.convolve(w/w.sum(),a,mode='valid')
 
