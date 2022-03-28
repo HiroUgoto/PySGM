@@ -11,6 +11,7 @@ setuptools.setup(
     author="goto hiroyuki",
     author_email="goto@catfish.dpri.kyoto-u.ac.jp",
     packages=setuptools.find_packages("src"),
+    description="Pysgm",
     package_dir={"": "src"},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     classifiers=[
