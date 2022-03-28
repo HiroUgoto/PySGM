@@ -10,14 +10,15 @@ setuptools.setup(
     version="0.1.0",
     author="goto hiroyuki",
     author_email="goto@catfish.dpri.kyoto-u.ac.jp",
+    description="Pysgm'",
     packages=setuptools.find_packages("src"),
-    description="Pysgm",
     package_dir={"": "src"},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
+    # packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.5',
+    python_requires='>=3.7',
 )
