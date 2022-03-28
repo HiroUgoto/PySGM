@@ -28,7 +28,7 @@ class pari:
                 lines = list(file)
 
             header = ""
-            ew,ns,ud = np.loadtxt(lines[1:], delimiter=",", usecols=(0,1,2), unpack=True)
+            ns,ew,ud = np.loadtxt(lines[1:], delimiter=",", usecols=(0,1,2), unpack=True)
 
             self.ew = np.array(ew)
             self.ns = np.array(ns)
