@@ -14,9 +14,22 @@ Python code to parse and analyze Strong Ground Motion records
 * SciPy
 * Matplotlib
 
+
+## Install
+
+以下のように，pipでインストールできます（環境に応じて，pipコマンドやpip3コマンドを使ってください）
+
+```sh
+$ pip install git+https://github.com/HiroUgoto/PySGM
+```
+```sh
+$ pip3 install git+https://github.com/HiroUgoto/PySGM
+```
+
+
 ## Usage
 
-K-NET強震動データを読み込んで，最大加速度（PGA）を求めてみよう
+K-NET強震動データを読み込んで，最大加速度（PGA）を求めてみましょう
 
 ```py
 import PySGM
