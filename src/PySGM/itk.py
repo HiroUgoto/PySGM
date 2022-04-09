@@ -6,7 +6,7 @@ from . import vector
 
 #/ Parse function sets /#
 def parse(input_dir,file_basename,start_time,end_time, \
-                    fmt='%Y%m%d%H%M', sc=2.5*980/(2.0**24) ):
+                    fmt='%Y%m%d%H%M', sc=2.5*980/(2.0**23) ):
 
     i = itk()
     i.parse(input_dir,file_basename,start_time,end_time,fmt,sc)
