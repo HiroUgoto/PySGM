@@ -6,18 +6,18 @@ from . import vector
 
 #/ Parse function sets /#
 def parse(input_dir,file_basename,start_time,end_time, \
-                    fmt='%Y%m%d%H%M', sc=2.5*980/(2.0**23) ):
+                    fmt='%Y%m%d%H%M', sc=2.5*980/(2.0**23), Titan=False):
 
     i = itk()
-    i.parse(input_dir,file_basename,start_time,end_time,fmt,sc)
+    i.parse(input_dir,file_basename,start_time,end_time,fmt,sc,Titan)
     v = i.to_vectors()
 
     return v
 
-def parse_SD(input_dir,start_time,end_time,fmt='%Y%m%d%H%M',sc=2.5*980/(2.0**23)):
+def parse_SD(input_dir,start_time,end_time,fmt='%Y%m%d%H%M',sc=2.5*980/(2.0**23),Titan=False):
 
     i = itk()
-    i.parse_SD(input_dir,start_time,end_time,fmt,sc)
+    i.parse_SD(input_dir,start_time,end_time,fmt,sc,Titan)
     v = i.to_vectors()
 
     return v
@@ -37,7 +37,7 @@ class itk:
 
 
     ### Parse ITK data ###
-    def parse(self,input_dir,file_basename,start_time,end_time,fmt,sc):
+    def parse(self,input_dir,file_basename,start_time,end_time,fmt,sc,Titan):
         st = datetime.datetime.strptime(start_time,fmt)
         et = datetime.datetime.strptime(end_time,fmt)
         m = (et-st).seconds // 60 + 1
@@ -60,10 +60,10 @@ class itk:
                 print(file_name)
                 print("File IO Error: ",e.strerror)
 
-        self.read_itk_data(st,datalines_list,sc)
+        self.read_itk_data(st,datalines_list,sc,Titan)
 
 
-    def parse_SD(self,input_dir,start_time,end_time,fmt,sc):
+    def parse_SD(self,input_dir,start_time,end_time,fmt,sc,Titan):
         st = datetime.datetime.strptime(start_time,fmt)
         et = datetime.datetime.strptime(end_time,fmt)
         m = (et-st).seconds // 60 + 1
@@ -85,12 +85,12 @@ class itk:
             except IOError as e:
                 print("File IO Error: ",e.strerror)
 
-        self.read_itk_data(st,datalines_list,sc)
+        self.read_itk_data(st,datalines_list,sc,Titan)
 
     # --------------------------------------------------------------------------- #
     #   Parse related methods
     # --------------------------------------------------------------------------- #
-    def read_itk_data(self,st,datalines_list,sc):
+    def read_itk_data(self,st,datalines_list,sc,Titan):
 
         ew_list = []
         ns_list = []
@@ -102,8 +102,12 @@ class itk:
             ns_list += ns_t
             ud_list += ud_t
 
-        self.ew = np.array(ew_list) * sc
-        self.ns = np.array(ns_list) * sc
+        if Titan:   # Swap 2ch -> X, 1ch -> Y
+            self.ew = np.array(ns_list) * sc
+            self.ns = np.array(ew_list) * sc
+        else:
+            self.ew = np.array(ew_list) * sc
+            self.ns = np.array(ns_list) * sc
         self.ud = np.array(ud_list) * sc
 
         ntim = len(self.ew)
