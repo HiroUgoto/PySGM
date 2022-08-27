@@ -6,11 +6,11 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pySGM",
-    version="0.1.3",
-    author="goto hiroyuki",
+    name="PySGM",
+    version="0.1.4",
+    author="Hiroyuki Goto",
     author_email="goto@catfish.dpri.kyoto-u.ac.jp",
-    description="Pysgm'",
+    description="PySGM",
     packages=setuptools.find_packages("src"),
     package_dir={"": "src"},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
