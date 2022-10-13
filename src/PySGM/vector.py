@@ -474,6 +474,11 @@ class vectors(vector):
         v2.header['ntim'] = ntim
         return v2
 
+    def reset_tim(self):
+        t0 = self.tim[0]
+        self.tim = self.tim - t0
+        self.header['ntim'] = len(self.tim)
+
     #----------------------------------------------#
     #  Wave Analysis
     #----------------------------------------------#
