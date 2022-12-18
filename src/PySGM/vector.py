@@ -565,9 +565,9 @@ class vectors(vector):
     def response_spectrum(self):
         self.period = np.logspace(-1,1,100)
 
-        self.Sa_ew, self.Sv_ew, self.Sd_ew = response.response_spectrum_FD(self.ew,self.period,self.dt)
-        self.Sa_ns, self.Sv_ns, self.Sd_ns = response.response_spectrum_FD(self.ns,self.period,self.dt)
-        self.Sa_ud, self.Sv_ud, self.Sd_ud = response.response_spectrum_FD(self.ud,self.period,self.dt)
+        self.Sa_ew, self.Sv_ew, self.Sd_ew = response.response_spectrum(self.ew,self.period,self.dt)
+        self.Sa_ns, self.Sv_ns, self.Sd_ns = response.response_spectrum(self.ns,self.period,self.dt)
+        self.Sa_ud, self.Sv_ud, self.Sd_ud = response.response_spectrum(self.ud,self.period,self.dt)
 
     def response_spectrum_max(self):
         self.period = np.logspace(-1,1,100)

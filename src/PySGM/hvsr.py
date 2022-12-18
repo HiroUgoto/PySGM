@@ -2,8 +2,6 @@ import numpy as np
 import scipy.signal
 import matplotlib.pyplot as plt
 
-# from . import vector
-
 #-----------------------------------------------------------------#
 def detrend(data):
     v = scipy.signal.detrend(data)
@@ -44,7 +42,7 @@ def smoothing(fourier_data,nw):
 #-----------------------------------------------------------------#
 def segment_selection(vector,tseg=40.96,mseg=10,print_flag=True,plot_flag=False):
 
-    vector_bp = vector.bandpass(0.05,50)
+    vector_bp = vector.bandpass(0.2,50)
 
     ud = vector_bp.ud
     ns = vector_bp.ns
@@ -111,8 +109,8 @@ def segment_selection(vector,tseg=40.96,mseg=10,print_flag=True,plot_flag=False)
     return segment_data
 
 #-----------------------------------------------------------------#
-def hv_spectra(vector,tseg=40.96,mseg=10,band_width=0.2,plot_flag=True):
-    segment_data = segment_selection(vector,tseg,mseg,print_flag=False)
+def hv_spectra(vector,tseg=40.96,mseg=10,band_width=0.3,plot_flag=True):
+    segment_data = segment_selection(vector,tseg,mseg,print_flag=False,plot_flag=True)
 
     fs = 1.0/vector.dt
     ns = len(segment_data)
@@ -146,6 +144,7 @@ def hv_spectra(vector,tseg=40.96,mseg=10,band_width=0.2,plot_flag=True):
         plt.figure()
         plt.xscale("log")
         plt.yscale("log")
+        plt.xlim([0.2,20])
         plt.xlabel("frequency (Hz)")
         plt.ylabel("H/V spectrum")
 
