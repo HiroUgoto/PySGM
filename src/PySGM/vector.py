@@ -480,6 +480,13 @@ class vectors(vector):
         self.header['ntim'] = len(self.tim)
 
     #----------------------------------------------#
+    def set_origin_time(self,origin_time_str):
+        origin_time = datetime.datetime.strptime(origin_time_str,"%Y/%m/%d %H:%M:%S")
+        record_time = datetime.datetime.strptime(self.header['record_time'],"%Y/%m/%d %H:%M:%S")
+        dt = record_time - origin_time
+        self.tim = self.tim + dt.total_seconds()
+
+    #----------------------------------------------#
     #  Wave Analysis
     #----------------------------------------------#
     def integration(self,low=0.2,high=50):
