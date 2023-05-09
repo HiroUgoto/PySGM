@@ -11,6 +11,7 @@ from . import response
 from . import spectrum
 from . import jsi
 from . import realtime_jsi
+from . import demand_curve
 
 #/ Parse function sets /#
 def parse(input_file,noheader=False):
@@ -123,6 +124,54 @@ class vector:
         wave2 = signal.lfilter(b,a,wave)
         return wave2
 
+    def direct_integration(wave,dt):
+        wave_int = wave.cumsum()*dt
+        return wave_int
+
+    # ---------------------------------------------------    
+    def boore_integration(acc,dt,t0):
+        def boore_coeff(vel,n0,n1):
+            ntim = len(vel)
+            x = np.array(range(ntim))
+            a0 = (vel[n0:n1].T @ (x[n0:n1]-n0)) / ((x[n0:n1]-n0).T @ (x[n0:n1]-n0))
+            a1 = ((vel[n1:]-a0*(n1-n0)).T @ (x[n1:]-n1)) / ((x[n1:]-n1).T @ (x[n1:]-n1))
+            return a0, a1
+
+        def boore_residual(vel,n0,n1,a0,a1):
+            x = range(len(vel))
+            res = np.sum(vel[0:n0]**2)
+            res += np.sum((vel[n0:n1] - a0*(range(n1-n0)))**2)
+            res += np.sum((vel[n1:] - (a1*(range(len(vel)-n1)) + a0*(n1-n0)))**2)
+            return res
+
+        vel = vector.direct_integration(acc,dt)
+        ntim = len(vel)
+        n0_ini = int(t0/dt)
+
+        for n0 in range(n0_ini,n0_ini+6000,100):
+            for n in range(100,3000,10):
+                n1 = n0 + n
+                a0,a1 = boore_coeff(vel,n0,n1)
+                res = boore_residual(vel,n0,n1,a0,a1)
+
+                if ('res_min' not in locals()) or (res < res_min):
+                    print(n0,n1,res)
+                    res_min = res
+                    n0_min = n0
+                    n1_min = n1
+
+        a0,a1 = boore_coeff(vel,n0_min,n1_min)
+        x = np.array(range(ntim))
+        y0 = a0*(x[n0_min:n1_min]-n0_min)
+        y1 = a1*(x[n1_min:]-n1_min) + a0*(n1_min-n0_min)
+
+        vel[n0_min:n1_min] -= y0
+        vel[n1_min:] -= y1
+        disp = vector.direct_integration(vel,dt)
+
+        return disp
+
+    # ---------------------------------------------------    
     def envelope_vector(wave):
         wave_ana = signal.hilbert(wave)
         wave_env = np.abs(wave_ana)
@@ -346,10 +395,16 @@ class vectors(vector):
     #----------------------------------------------#
     #  Correction functions
     #----------------------------------------------#
-    def trend_removal(self):
-        self.ew = self.ew - np.average(self.ew)
-        self.ns = self.ns - np.average(self.ns)
-        self.ud = self.ud - np.average(self.ud)
+    def trend_removal(self,sec=None):
+        if sec is None:
+            self.ew = self.ew - np.average(self.ew)
+            self.ns = self.ns - np.average(self.ns)
+            self.ud = self.ud - np.average(self.ud)
+        else:
+            n = int(sec/self.dt)
+            self.ew = self.ew - np.average(self.ew[:n])
+            self.ns = self.ns - np.average(self.ns[:n])
+            self.ud = self.ud - np.average(self.ud[:n])
 
     def rotation(self,rot,deg='deg'):
 
@@ -520,6 +575,21 @@ class vectors(vector):
         v2.ud = vector.bandpass_butter(self.ud,self.dt,low,high,order)
         return v2
 
+    def direct_integration(self):
+        v2 = copy.deepcopy(self)
+        v2.ew = vector.direct_integration(self.ew,self.dt)
+        v2.ns = vector.direct_integration(self.ns,self.dt)
+        v2.ud = vector.direct_integration(self.ud,self.dt)
+        return v2
+
+    def boore_integration(self,t0=15.0):
+        v2 = copy.deepcopy(self)
+        v2.trend_removal(sec=t0)
+        v2.ew = vector.boore_integration(self.ew,self.dt,t0)
+        v2.ns = vector.boore_integration(self.ns,self.dt,t0)
+        v2.ud = vector.boore_integration(self.ud,self.dt,t0)
+        return v2
+
     def envelope(self):
         v2 = copy.deepcopy(self)
         v2.ew = vector.envelope_vector(self.ew)
@@ -643,6 +713,12 @@ class vectors(vector):
 
         return peak_Sv, peak_period
 
+    def demand_curve(self,ductility=4.0):
+        self.period = np.logspace(-1,np.log10(5.0),25)
+
+        self.Dc_ew = demand_curve.demand_curve(self.ew,self.period,ductility,self.dt)
+        self.Dc_ns = demand_curve.demand_curve(self.ns,self.period,ductility,self.dt)
+
     def hv_spectrum(self,nt=4096,start=60,ncut=10,window=0.2):
 
         fsample = 1.0/self.dt
@@ -753,6 +829,13 @@ class vectors(vector):
 
     def output_ps(self,output_file,fmt="%15.7f"):
         self.ps.output(output_file,fmt=fmt)
+
+
+    def output_dc(self,output_file,fmt="%15.7f"):
+        header = str(self.header)
+
+        output = np.c_[self.period,self.Dc_ew,self.Dc_ns]
+        np.savetxt(output_file+".dc",output,fmt=fmt,header=header,comments="#")
 
     #----------------------------------------------#
     #  Plot functions
