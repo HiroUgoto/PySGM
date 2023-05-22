@@ -4,6 +4,7 @@ from . import win
 from . import gns
 from . import sac
 import os
+import pickle
 
 def parse(file_name,file_name2="",file_name3="",fmt="vector",
     gain="",bit="",noheader=False):
@@ -36,3 +37,8 @@ def parse(file_name,file_name2="",file_name3="",fmt="vector",
     elif fmt == "sac":
         v = sac.parse(file_name,file_name2,file_name3)
         return v
+
+def input_pickle(input_file):
+    with open(input_file,'rb') as f:
+        v = pickle.load(f)
+    return v

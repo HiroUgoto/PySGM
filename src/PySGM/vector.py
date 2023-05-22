@@ -5,7 +5,7 @@ from matplotlib.ticker import FormatStrFormatter
 import datetime
 import math
 import copy
-import sys
+import pickle
 
 from . import response
 from . import spectrum
@@ -795,12 +795,20 @@ class vectors(vector):
         v = vectors(header,tim,ew,ns,ud)
         return v
 
+    def input_pickle(input_file):
+        with open(input_file,'rb') as f:
+            v = pickle.load(f)
+        return v
 
+    #----------------------------------------------#
     def output(self,output_file,fmt="%15.7f"):
         header = str(self.header)
         output = np.c_[self.tim,self.ew,self.ns,self.ud]
         np.savetxt(output_file,output,fmt=fmt,header=header,comments="#")
 
+    def output_pickle(self,output_file):
+        with open(output_file,'wb') as f:
+            pickle.dump(self,f)
 
     def output_rs(self,output_file,fmt="%15.7f"):
         header = str(self.header)
