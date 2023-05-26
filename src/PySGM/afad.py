@@ -79,7 +79,10 @@ class afad:
             elif items[0] in header_keys_long:
                 if len(items) <= 2:
                     header_dict[items[0]] = items[1]
-                    record_time = datetime.datetime.strptime(header_dict['DATE_TIME_FIRST_SAMPLE_YYYYMMDD_HHMMSS:'],"%d%m%Y_%H%M%S")
+                    try:
+                        record_time = datetime.datetime.strptime(header_dict['DATE_TIME_FIRST_SAMPLE_YYYYMMDD_HHMMSS:'],"%Y%m%d_%H%M%S")
+                    except:
+                        record_time = datetime.datetime.strptime(header_dict['DATE_TIME_FIRST_SAMPLE_YYYYMMDD_HHMMSS:'],"%d%m%Y_%H%M%S")
                     triger_msec = 0.0
                 else:
                     header_dict[items[0]] = items[1] + " " + items[2]
