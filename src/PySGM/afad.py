@@ -77,13 +77,17 @@ class afad:
             if items[0] in header_keys:
                 header_dict[items[0]] = items[1]
             elif items[0] in header_keys_long:
-                header_dict[items[0]] = items[1] + " " + items[2]
+                if len(items) <= 2:
+                    header_dict[items[0]] = items[1]
+                    record_time = datetime.datetime.strptime(header_dict['DATE_TIME_FIRST_SAMPLE_YYYYMMDD_HHMMSS:'],"%d%m%Y_%H%M%S")
+                    triger_msec = 0.0
+                else:
+                    header_dict[items[0]] = items[1] + " " + items[2]
+                    record_time = datetime.datetime.strptime(header_dict['DATE_TIME_FIRST_SAMPLE_YYYYMMDD_HHMMSS:'][:19],"%Y/%m/%d %H:%M:%S")
+                    record_time += datetime.timedelta(seconds=1)
+                    triger_msec = float(header_dict['DATE_TIME_FIRST_SAMPLE_YYYYMMDD_HHMMSS:'][19:])
 
         self.dt = float(header_dict['SAMPLING_INTERVAL_S:'])
-        record_time = datetime.datetime.strptime(header_dict['DATE_TIME_FIRST_SAMPLE_YYYYMMDD_HHMMSS:'][:19],"%Y/%m/%d %H:%M:%S")
-        record_time += datetime.timedelta(seconds=1)
-
-        triger_msec = float(header_dict['DATE_TIME_FIRST_SAMPLE_YYYYMMDD_HHMMSS:'][19:])
         self.roll = int((1.0-triger_msec)/self.dt)          # number of trim data 
 
         header = {'code':header_dict['STATION_CODE:'],'record_time':record_time.strftime('%Y/%m/%d %H:%M:%S'),
