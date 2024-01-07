@@ -719,6 +719,9 @@ class vectors(vector):
         self.Dc_ew = demand_curve.demand_curve(self.ew,self.period,ductility,self.dt)
         self.Dc_ns = demand_curve.demand_curve(self.ns,self.period,ductility,self.dt)
 
+    def cumulative_square(self):
+        return np.sum(self.ns**2 + self.ew**2) * self.dt
+
     def hv_spectrum(self,nt=4096,start=60,ncut=10,window=0.2):
 
         fsample = 1.0/self.dt
