@@ -2,17 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-try:
-    from numba import jit
-except ImportError:
-    def jit(*args, **_kwargs):
-        if len(args) > 0 and hasattr(args[0], "__call__"):
-            return args[0]
-        else:
-            def _(func):
-                return func
-            return _
-
 #######################################
 ##          Resp    Method           ##
 #######################################
@@ -70,7 +59,6 @@ def response_spectrum_FD(wave,period,dt):
 
     return np.array(sa_list), np.array(sv_list), np.array(sd_list)
 
-@jit(nopython=True)
 def response_spectrum_pseudo(ew,ns,period,dt):
     ntim = min(len(ew),30000)
     psv_list = []
@@ -94,7 +82,6 @@ def response_spectrum_pseudo(ew,ns,period,dt):
 
     return np.array(psv_list),peak_psv,peak_period
 
-@jit(nopython=True)
 def response_spectrum_pseudo_FD(ew,ns,period,dt):
     h = 0.05
     img = 0.0 + 1.0j
@@ -132,7 +119,6 @@ def response_spectrum_pseudo_FD(ew,ns,period,dt):
 
     return np.array(psv_list),peak_psv,peak_period
 
-@jit(nopython=True)
 def response_spectrum_peak_period_sv(ew,ns,period,dt):
     ntim = min(len(ew),30000)
     sv_list = []
@@ -154,7 +140,6 @@ def response_spectrum_peak_period_sv(ew,ns,period,dt):
 
     return peak,peak_period
 
-@jit(nopython=True)
 def response_spectrum_max(ew,ns,period,dt):
 
     ntim = min(len(ew),30000)
@@ -201,8 +186,6 @@ def response_spectrum_max(ew,ns,period,dt):
     return np.array(sa_list), np.array(sv_list), np.array(sd_list), \
         np.array(sa_rot_list), np.array(sv_rot_list), np.array(sd_rot_list)
 
-
-@jit(nopython=True)
 def calc_SI(ew,ns,dt):
     ntim = min(len(ew),30000)
     period,dp = np.linspace(0.1,2.5,25,retstep=True)
@@ -227,7 +210,6 @@ def calc_SI(ew,ns,dt):
     SI = np.max(SI_list)/2.4
     return SI
 
-@jit(nopython=True)
 def calc_SI_FD(ew,ns,dt):
     h = 0.20
     img = 0.0 + 1.0j
@@ -269,8 +251,6 @@ def calc_SI_FD(ew,ns,dt):
     SI = np.max(SI_list)/2.4
     return SI
 
-
-@jit(nopython=True)
 def response_1dof(wave,period,dt,h=0.05):
     ntim = len(wave)
     beta = 1.0 / 6.0
@@ -310,7 +290,6 @@ def response_1dof(wave,period,dt,h=0.05):
 
     return sa, sv, sd
 
-@jit(nopython=True)
 def response_1dof_full(wave,period,dt,h=0.05):
     ntim = len(wave)
     beta = 1.0 / 6.0
