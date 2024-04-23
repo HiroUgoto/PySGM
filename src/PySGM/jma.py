@@ -205,8 +205,10 @@ class jma:
 #------------------------------------------------------------#
     def read_jma_csv_data(self,datalines,file_name,fmt=','):
 
-        code = datalines[0][11:-1].replace(' ','')
-#        record_time = file_name[-22:-8]
+        item = datalines[0].strip().split(fmt)[0]
+        code = item.split("=")[1].replace(' ','')
+        # code = datalines[0][11:-1].replace(' ','')
+
         record_time = datalines[5][14:35].strip()
         parse_time = datetime.datetime.strptime(record_time,"%Y %m %d %H %M %S")
         record_time = parse_time.strftime('%Y/%m/%d %H:%M:%S')
