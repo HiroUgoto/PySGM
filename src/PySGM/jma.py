@@ -207,14 +207,16 @@ class jma:
 
         item = datalines[0].strip().split(fmt)[0]
         code = item.split("=")[1].replace(' ','')
-        # code = datalines[0][11:-1].replace(' ','')
 
-        record_time = datalines[5][14:35].strip()
+        item = datalines[5].strip().split(fmt)[0]
+        record_time = item.split("=")[1].strip()
         parse_time = datetime.datetime.strptime(record_time,"%Y %m %d %H %M %S")
         record_time = parse_time.strftime('%Y/%m/%d %H:%M:%S')
 
-        slat = datalines[1][-8:]
-        slon = datalines[2][-9:]
+        item = datalines[1].strip().split(fmt)[0]
+        slat = item.split("=")[1].strip()
+        item = datalines[2].strip().split(fmt)[0]
+        slon = item.split("=")[1].strip()
 
         lat = float(slat)
         lon = float(slon)
