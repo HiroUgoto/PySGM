@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="PySGM",
-    version="0.1.8.2",
+    version="0.1.8.3",
     author="Hiroyuki Goto",
     author_email="goto@catfish.dpri.kyoto-u.ac.jp",
     description="PySGM",
