@@ -6,6 +6,7 @@ import datetime
 import math
 import copy
 import pickle
+import csv
 
 from . import response
 from . import spectrum
@@ -808,6 +809,15 @@ class vectors(vector):
         header = str(self.header)
         output = np.c_[self.tim,self.ew,self.ns,self.ud]
         np.savetxt(output_file,output,fmt=fmt,header=header,comments="#")
+
+    def output_csv(self,output_file,fmt="%15.7f"):
+        header = ["{}: {}".format(key,self.header[key]) for key in self.header.keys()]
+        output = np.c_[self.tim,self.ew,self.ns,self.ud]
+        with open(output_file,'w') as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            writer.writerow(["tim","ew","ns","ud"])
+            writer.writerows(output)
 
     def output_pickle(self,output_file):
         with open(output_file,'wb') as f:
