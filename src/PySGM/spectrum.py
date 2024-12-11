@@ -30,7 +30,7 @@ class spectrum:
                 nw += 1
 
             nw2 = int((nw-1)/2)
-            w = signal.parzen(nw)
+            w = signal.windows.parzen(nw)
 
             a = np.r_[self.ew[nw2:0:-1],self.ew,self.ew[0],self.ew[-1:-nw2:-1]]
 
