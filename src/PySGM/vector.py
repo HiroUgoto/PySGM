@@ -861,7 +861,7 @@ class vectors(vector):
     #----------------------------------------------#
     #  Plot functions
     #----------------------------------------------#
-    def plot_all(self,start=0,end=60,to_end=False):
+    def plot_all(self,start=0,end=60,to_end=False,output_file=None):
 
         if to_end:
             start = self.tim[0]
@@ -909,8 +909,10 @@ class vectors(vector):
         ax3.text(0.02,0.85,"UD",transform=ax3.transAxes)
 
         plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0, hspace=0)
-        plt.show()
-
+        if output_file is None:
+            plt.show()
+        else:
+            plt.savefig(output_file)
 
     def plot_rs_all(self):
         fig = plt.figure()
