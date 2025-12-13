@@ -742,6 +742,16 @@ class vectors(vector):
         self.Sa_ud, self.Sv_ud, self.Sd_ud = response.response_spectrum(self.ud,self.period,self.dt)
 
     def response_spectrum_max(self):
+        """
+            水平成分の応答スペクトルをRotD100で算出する．実行するとvectorsオブジェクトに以下のAttributesが追加される．
+
+            Sa: 加速度応答スペクトル（h=5%)
+            Sv: 速度応答スペクトル（h=5%)
+            Sd: 変位応答スペクトル（h=5%)
+            Sa_rot: 加速度応答スペクトルが最大となる方位（ラジアン）
+            Sv_rot: 速度応答スペクトルが最大となる方位（ラジアン）
+            Sd_rot: 変位応答スペクトルが最大となる方位（ラジアン）
+        """
         self.period = np.logspace(-1,1,100)
 
         self.Sa, self.Sv, self.Sd, self.Sa_rot, self.Sv_rot, self.Sd_rot = response.response_spectrum_max(self.ew,self.ns,self.period,self.dt)

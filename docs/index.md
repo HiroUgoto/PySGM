@@ -24,9 +24,9 @@ K-NET強震動データを読み込んで，最大加速度（PGA）を求めて
 import PySGM
 
 file_name = "~~~.EW"  # .EWファイルのみ指定すれば良い
-acc = PySGM.parse(file_name,fmt="nied")   # 自動的に .NS .UD ファイルも読み込んで，3成分記録をvectorオブジェクト（独自）に変換
+acc = PySGM.parse(file_name,fmt="nied")   # 自動的に .NS .UD ファイルも読み込んで，3成分記録をvectorsオブジェクト（独自）に変換
 
-acc.trend_removal()  # vectorオブジェクトでは様々な解析ができます．まずは基線補正．
+acc.trend_removal()  # vectorsオブジェクトでは様々な解析ができます．まずは基線補正．
 acc.peak_ground_3d() # 3成分合成の最大加速度が出力されます
 
 acc.output("~~~~~~~.acc")  # ファイルに出力できます
@@ -51,7 +51,7 @@ PySGMで出力したテキストデータを再読み込みする
 
 ### Wave Analysis
 
-読み込み後に利用可能な解析ツール群．以下のようにvectorオブジェクトを生成したとする．
+読み込み後に利用可能な解析ツール群．以下のようにvectorsオブジェクトを生成したとする．
 
 ```py
 vector = PySGM.parse(file_name)
