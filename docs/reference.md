@@ -8,17 +8,17 @@
 ### Functions (関数)
 ::: PySGM.vector
     options: 
-        show_root_heading: false
-        members:
-             - parse
+      show_root_heading: false
+      members:
+        - parse
 
 ### Classes (クラス)
 ::: PySGM.vector
     options:
-        show_root_heading: false
-        members:
-            - vector
-            - vectors
+      show_root_heading: false
+      members:
+        - vector
+        - vectors
 
 
 <!-- ::: PySGM.response
