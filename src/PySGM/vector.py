@@ -351,28 +351,26 @@ class vector:
 ##          Vectors   class          ##
 #######################################
 class vectors(vector):
-    """3成分（EW, NS, UD）の強震動データを一括して管理・解析するためのクラスです。
-
-    単一成分の解析機能を3成分同時に適用する機能や、震度計算、成分回転などの3成分特有の解析機能を提供します。
+    """3成分（EW, NS, UD）の強震動データを一括して管理・解析するためのクラス
 
     Attributes:
-        header (dict): 観測点情報や記録時間などを含むヘッダー。
-        tim (numpy.ndarray): 時間軸データ。
-        ew (numpy.ndarray): EW成分の波形データ。
-        ns (numpy.ndarray): NS成分の波形データ。
-        ud (numpy.ndarray): UD成分の波形データ。
-        dt (float): サンプリング間隔。
+        header (dict): 観測点情報や記録時間などを含むヘッダー
+        tim (numpy.ndarray): 時間軸データ
+        ew (numpy.ndarray): EW成分の波形データ
+        ns (numpy.ndarray): NS成分の波形データ
+        ud (numpy.ndarray): UD成分の波形データ
+        dt (float): サンプリング間隔
     """
 
     def __init__(self,header,tim,ew,ns,ud):
-        """vectors クラスを初期化します。
+        """vectors クラスの初期化
 
         Args:
-            header (dict): ヘッダー情報。
-            tim (numpy.ndarray): 時間データ。
-            ew (numpy.ndarray): EW成分のデータ。
-            ns (numpy.ndarray): NS成分のデータ。
-            ud (numpy.ndarray): UD成分のデータ。
+            header (dict): ヘッダー情報
+            tim (numpy.ndarray): 時間データ
+            ew (numpy.ndarray): EW成分のデータ
+            ns (numpy.ndarray): NS成分のデータ
+            ud (numpy.ndarray): UD成分のデータ
         """
         self.header = header
         self.tim = tim
@@ -382,6 +380,11 @@ class vectors(vector):
         self.dt = tim[1] - tim[0]
 
     def copy(self):
+        """vectors オブジェクトのコピー
+
+        Returns:
+            vectors: コピーされた vectors オブジェクト
+        """
         v2 = copy.deepcopy(self)
         return v2
 
@@ -389,6 +392,13 @@ class vectors(vector):
     #  Construction functions
     #----------------------------------------------#
     def append(self,v):
+        """vectors オブジェクトを後ろに繋げる
+        Args:
+            v (vectors): 後ろに追加する vectors オブジェクト
+
+        Returns:
+            vectors: 後ろにvが追加された vectors オブジェクト
+        """
         v2 = self
         v2.header = self.header
         v2.ew = np.hstack((self.ew,v.ew))

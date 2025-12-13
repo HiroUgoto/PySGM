@@ -1,9 +1,9 @@
 # API Reference
 
-## Main Module
+## データ読み込み
 ::: PySGM.main
 
-## Signal Analysis
+## 波形解析
 ::: PySGM.vector
 
 <!-- ::: PySGM.response

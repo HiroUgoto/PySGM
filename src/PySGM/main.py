@@ -17,7 +17,7 @@ def parse(file_name,file_name2=None,file_name3=None,fmt="vector",
         fmt (str, optional): データのフォーマット ("vector", "nied", "jma", "win", "gns", "sac")．デフォルトはvecotrs形式（"vector"）
         gain (float, optional): 振幅倍率（win形式のみ）
         bit (int, optional): データビット数（win形式のみ）
-        noheader (bool, optional): ヘッダーがあるかどうか（vector形式のみ）
+        noheader (bool, optional): ヘッダーがあるかどうか（vectors形式のみ）
 
     Returns:
         vectors: 読み込まれたデータの vectors オブジェクト
