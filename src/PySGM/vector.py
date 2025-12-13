@@ -23,7 +23,24 @@ def parse(input_file,noheader=False):
 ##          Vector    class          ##
 #######################################
 class vector:
+    """
+        単一成分の波形データを扱う基本クラス。
+
+    Attributes:
+        header (dict): 観測点情報や記録時間などを含むヘッダー
+        tim (numpy.ndarray): 時間軸データ（秒）
+        wave (numpy.ndarray): 波形データ（加速度など）
+        dt (float): サンプリング間隔（秒）
+    """
     def __init__(self,header,tim,wave):
+        """
+            vector クラスの初期化
+
+        Args:
+            header (dict): ヘッダー情報
+            tim (numpy.ndarray): 時間軸データ
+            wave (numpy.ndarray): 波形データ
+        """
         self.header = header
         self.tim = tim
         self.wave = wave
@@ -37,6 +54,18 @@ class vector:
     #  Wave Analysis
     #----------------------------------------------#
     def integration(wave,dt,low,high):
+        """
+            フーリエ変換を用いた数値積分
+
+        Args:
+            wave (numpy.ndarray): 積分対象の波形データ
+            dt (float): サンプリング間隔（秒）
+            low (float): 低域カットオフ周波数(Hz)
+            high (float): 高域カットオフ周波数(Hz)
+
+        Returns:
+            numpy.ndarray: 積分後の波形データ
+        """
         w = np.fft.fft(wave)
         freq = np.fft.fftfreq(len(wave),d=dt)
         df = freq[1] - freq[0]
@@ -351,23 +380,23 @@ class vector:
 ##          Vectors   class          ##
 #######################################
 class vectors(vector):
-    """3成分（EW, NS, UD）の強震動データを一括して管理・解析するためのクラス
+    """
+        3成分（EW, NS, UD）の強震動データを一括して管理・解析するためのクラス
 
     Attributes:
         header (dict): 観測点情報や記録時間などを含むヘッダー
-        tim (numpy.ndarray): 時間軸データ
+        tim (numpy.ndarray): 時間軸データ（秒）
         ew (numpy.ndarray): EW成分の波形データ
         ns (numpy.ndarray): NS成分の波形データ
         ud (numpy.ndarray): UD成分の波形データ
-        dt (float): サンプリング間隔
+        dt (float): サンプリング間隔（秒）
     """
-
     def __init__(self,header,tim,ew,ns,ud):
         """vectors クラスの初期化
 
         Args:
             header (dict): ヘッダー情報
-            tim (numpy.ndarray): 時間データ
+            tim (numpy.ndarray): 時間軸データ
             ew (numpy.ndarray): EW成分のデータ
             ns (numpy.ndarray): NS成分のデータ
             ud (numpy.ndarray): UD成分のデータ
@@ -380,11 +409,6 @@ class vectors(vector):
         self.dt = tim[1] - tim[0]
 
     def copy(self):
-        """vectors オブジェクトのコピー
-
-        Returns:
-            vectors: コピーされた vectors オブジェクト
-        """
         v2 = copy.deepcopy(self)
         return v2
 
@@ -393,11 +417,12 @@ class vectors(vector):
     #----------------------------------------------#
     def append(self,v):
         """vectors オブジェクトを後ろに繋げる
+
         Args:
             v (vectors): 後ろに追加する vectors オブジェクト
 
         Returns:
-            vectors: 後ろにvが追加された vectors オブジェクト
+            vectors: 後ろにvが追加された新しい vectors インスタンス
         """
         v2 = self
         v2.header = self.header
@@ -427,6 +452,16 @@ class vectors(vector):
     #  Correction functions
     #----------------------------------------------#
     def trend_removal(self,sec=None):
+        """
+            3成分（EW, NS, UD）すべてに対して、線形トレンドの除去（基線補正）を一括適用する
+
+        Args:
+            なし
+
+        Returns:
+            なし（インスタンス内の各成分が補正後の波形に更新される）
+        """
+        
         if sec is None:
             self.ew = self.ew - np.average(self.ew)
             self.ns = self.ns - np.average(self.ns)
@@ -438,7 +473,16 @@ class vectors(vector):
             self.ud = self.ud - np.average(self.ud[:n])
 
     def rotation(self,rot,deg='deg'):
+        """
+            水平2成分（EW, NS）を指定した角度だけ回転させる
 
+        Args:
+            rot (float): 回転角
+            deg (str): 角度の単位。'deg'（度）または 'rad'（ラジアン）
+
+        Returns:
+            vectors: 回転後の成分を持つ新しい vectors インスタンス
+        """
         if deg == 'deg':
             rad = rot/180.0 * math.pi
         else:
@@ -576,6 +620,16 @@ class vectors(vector):
     #  Wave Analysis
     #----------------------------------------------#
     def integration(self,low=0.2,high=50):
+        """
+            3成分（EW, NS, UD）すべてに対して、フーリエ変換を用いて数値積分する．指定した周波数帯域（low - high）以外はカットされる．
+
+        Args:
+            low (float,optional): 低域カットオフ周波数（Hz）．デフォルトは 0.2
+            high (float,optional): 高域カットオフ周波数（Hz）．デフォルトは 50
+
+        Returns:
+            なし（インスタンス内の self.ew, self.ns, self.ud が積分後の波形に更新される）
+        """
         v2 = copy.deepcopy(self)
         v2.ew = vector.integration(self.ew,self.dt,low,high)
         v2.ns = vector.integration(self.ns,self.dt,low,high)
@@ -592,6 +646,16 @@ class vectors(vector):
         return v2
 
     def bandpass(self,low=0.05,high=10):
+        """
+            3成分（EW, NS, UD）すべてに対して、バンドパスフィルタを一括適用する
+
+        Args:
+            low (float): 低域カットオフ周波数（Hz）
+            high (float): 高域カットオフ周波数（Hz）
+
+        Returns:
+            なし（インスタンス内の各成分がフィルタ適用後の波形に更新される）
+        """
         v2 = copy.deepcopy(self)
         v2.ew = vector.bandpass(self.ew,self.dt,low,high)
         v2.ns = vector.bandpass(self.ns,self.dt,low,high)
@@ -699,6 +763,15 @@ class vectors(vector):
         return SI
 
     def peak_ground_3d(self,print_result=True):
+        """
+            3成分合成波の最大値（PGAやPGV）を算出する
+
+        Args:
+            print_result (bool): 結果を表示するかどうか
+
+        Returns:
+            float: 最大値
+        """
         PG = math.sqrt(np.max(self.ew**2 + self.ns**2 + self.ud**2))
 
         if print_result:
@@ -707,6 +780,15 @@ class vectors(vector):
         return PG
 
     def peak_ground_2d(self,print_result=True):
+        """
+            水平2成分合成波の最大値（PGAやPGV）を算出する
+
+        Args:
+            print_result (bool): 結果を表示するかどうか
+
+        Returns:
+            float: 最大値
+        """
         PG = math.sqrt(np.max(self.ew**2 + self.ns**2))
 
         if print_result:
@@ -727,6 +809,15 @@ class vectors(vector):
         return PG_ew, PG_ns, PG_ud
 
     def jma_seismic_intensity(self,print_result=True):
+        """
+            気象庁計測震度を計算
+
+        Args:
+            print_result (bool,optional): 結果をコンソールに表示する場合はTrue
+
+        Returns:
+            float: 計算された計測震度値
+        """
         si = jsi.jsi(self.ew,self.ns,self.ud,self.dt)
 
         if print_result:
@@ -900,7 +991,15 @@ class vectors(vector):
     #  Plot functions
     #----------------------------------------------#
     def plot_all(self,start=0,end=60,to_end=False,output_file=None):
+        """
+            3成分（EW, NS, UD）の時刻歴波形を一括してプロットします。
 
+        Args:
+            start (float,optional): 表示の開始時刻（秒）
+            end (float,optional): 表示の終了時刻（秒）
+            to_end (bool,optional): 波形データの最後まで表示する場合はTrue
+            output_file (str,optional): 外部ファイルに画像として出力する場合は，ファイル名を指定する．ファイル名の拡張子に応じた形式で保存される．
+        """
         if to_end:
             start = self.tim[0]
             end = self.tim[-1]

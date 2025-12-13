@@ -1,6 +1,6 @@
 # API Reference
 
-## データ読み込み
+## 波形データの読み込み
 ::: PySGM.main
 
 ## 波形解析
