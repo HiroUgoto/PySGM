@@ -33,6 +33,7 @@ acc.output("~~~~~~~.acc")  # ファイルに出力できます
 ```
 
 基本的な使い方は，以下の手順です
+
 1. データ形式を指定して読み込む
 2. 解析する
 
@@ -108,5 +109,4 @@ velocity.output_rs(output_rs_file_name) # 応答スペクトルが出力され�
 
 ---
 
-著者
 Hiroyuki Goto (Kyoto University)
