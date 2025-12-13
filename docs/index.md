@@ -13,7 +13,7 @@
 
 ```bash
 # GitHubから最新版をインストール
-pip install git+[https://github.com/HiroUgoto/PySGM](https://github.com/HiroUgoto/PySGM)
+pip install git+https://github.com/HiroUgoto/PySGM
 ```
 
 ## 使用方法（例）
