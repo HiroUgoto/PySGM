@@ -704,8 +704,8 @@ class vectors(vector):
 
         return si
 
-    def GM2025_modified_intensity(self,print_result=True):
-        si = jsi.GM2025(self.ew,self.ns,self.ud,self.dt)
+    def GM2025_modified_intensity(self,k=0.4,print_result=True):
+        si = jsi.GM2025(self.ew,self.ns,self.ud,self.dt,k)
 
         if print_result:
             print("GM2025 Intensity: ", si)
