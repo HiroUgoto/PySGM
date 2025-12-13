@@ -21,7 +21,6 @@ def jsi(ew,ns,ud,dt):
 
     return I
 
-
 def jsi_filter(wave,dt):
 
     ntim = len(wave)
@@ -42,3 +41,22 @@ def jsi_filter(wave,dt):
     wave_filtered = ifft(wave_f)
 
     return wave_filtered
+
+#----------------------------------------------------------
+# Modified Seismic Intensity by Goto and Mori (2025)
+#  https://doi.org/10.2208/jscejj.24-13504
+#----------------------------------------------------------
+def GM2025(ew,ns,ud,dt,k=0.4):
+    ew = simple_trim(ew,k)
+    ns = simple_trim(ns,k)
+
+    return jsi(ew,ns,ud,dt)
+
+def simple_trim(acc0,k=0.4):
+    kg = k * 980
+
+    acc0 = acc0 - np.average(acc0)
+    a = np.where(acc0 > kg, kg, acc0)
+    acc = np.where(a < -kg, -kg, a) 
+
+    return acc

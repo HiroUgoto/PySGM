@@ -704,6 +704,14 @@ class vectors(vector):
 
         return si
 
+    def GM2025_modified_intensity(self,print_result=True):
+        si = jsi.GM2025(self.ew,self.ns,self.ud,self.dt)
+
+        if print_result:
+            print("GM2025 Intensity: ", si)
+
+        return si
+
     def realtime_seismic_intensity(self):
         rsi = realtime_jsi.realtime_jsi(self.ew,self.ns,self.ud,self.dt)
         return rsi
