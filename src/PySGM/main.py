@@ -8,7 +8,17 @@ import pickle
 
 def parse(file_name,file_name2="",file_name3="",fmt="vector",
     gain="",bit="",noheader=False):
+    """強震動データを読み込み、適切な形式でパースします。
 
+    Args:
+        file_name (str): 読み込むファイルのパス。
+        file_name2 (str, optional): 追加のファイルパス（SAC形式用など）。
+        fmt (str): データのフォーマット ("vector", "nied", "jma", "win", "gns", "sac")。
+        noheader (bool): ヘッダーを無視するかどうか。
+
+    Returns:
+        vectors: パースされたデータを含む vectors オブジェクト。
+    """
     if fmt == "vector":
         v = vector.parse(file_name,noheader)
         return v

@@ -1,0 +1,17 @@
+site_name: PySGM
+site_description: "A Python code to parse and analyze Strong Ground Motion records" 
+
+theme:
+  name: material
+  language: ja 
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+
+nav:
+  - Home: index.md
+  - Reference: reference.md

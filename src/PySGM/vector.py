@@ -23,7 +23,6 @@ def parse(input_file,noheader=False):
 ##          Vector    class          ##
 #######################################
 class vector:
-
     def __init__(self,header,tim,wave):
         self.header = header
         self.tim = tim
@@ -352,8 +351,29 @@ class vector:
 ##          Vectors   class          ##
 #######################################
 class vectors(vector):
+    """3成分（EW, NS, UD）の強震動データを一括して管理・解析するためのクラスです。
+
+    単一成分の解析機能を3成分同時に適用する機能や、震度計算、成分回転などの3成分特有の解析機能を提供します。
+
+    Attributes:
+        header (dict): 観測点情報や記録時間などを含むヘッダー。
+        tim (numpy.ndarray): 時間軸データ。
+        ew (numpy.ndarray): EW成分の波形データ。
+        ns (numpy.ndarray): NS成分の波形データ。
+        ud (numpy.ndarray): UD成分の波形データ。
+        dt (float): サンプリング間隔。
+    """
 
     def __init__(self,header,tim,ew,ns,ud):
+        """vectors クラスを初期化します。
+
+        Args:
+            header (dict): ヘッダー情報。
+            tim (numpy.ndarray): 時間データ。
+            ew (numpy.ndarray): EW成分のデータ。
+            ns (numpy.ndarray): NS成分のデータ。
+            ud (numpy.ndarray): UD成分のデータ。
+        """
         self.header = header
         self.tim = tim
         self.ew = ew
