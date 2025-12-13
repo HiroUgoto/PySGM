@@ -6,20 +6,21 @@
 ## 波形解析 (vector.py)
 このモジュールには、データの読み込み関数と、波形を扱うための主要クラスが含まれています．
 ### Functions (関数)
-::: PySGM.vector
+::: PySGM.vector.parse
     options: 
-      show_root_heading: false
-      members:
-        - parse
+        show_root_toc_entry: false
+        show_root_full_path: false
 
 ### Classes (クラス)
-::: PySGM.vector
+::: PySGM.vector.vector
     options:
-      show_root_heading: false
-      members:
-        - vector
-        - vectors
+        show_root_toc_entry: false
+        show_root_full_path: false
 
+::: PySGM.vector.vectors
+    options:
+        show_root_toc_entry: false
+        show_root_full_path: false
 
 <!-- ::: PySGM.response
 ::: PySGM.spectrum
