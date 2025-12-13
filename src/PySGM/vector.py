@@ -16,6 +16,18 @@ from . import demand_curve
 
 #/ Parse function sets /#
 def parse(input_file,noheader=False):
+    """
+        指定されたファイルを読み込み、3成分一括解析用の vectors オブジェクトを生成する
+
+        この関数は内部で vectors.input を呼び出す．主に PySGM 独自のテキスト形式（vector形式）を読み込む際に使用する．
+
+    Args:
+        input_file (str): 読み込むファイルのパス
+        noheader (bool): ファイルにヘッダー行がない場合は True を指定します
+
+    Returns:
+        vectors: 読み込まれたデータを持つ vectors クラスのインスタンス
+    """
     v = vectors.input(input_file,noheader)
     return v
 
@@ -747,12 +759,12 @@ class vectors(vector):
 
         Returns:
             None: このメソッドは値を返さない．代わりに以下の属性が追加される．
-                - Sa: 加速度応答スペクトル（h=5%)
-                - Sv: 速度応答スペクトル（h=5%)
-                - Sd: 変位応答スペクトル（h=5%)
-                - Sa_rot: 加速度応答スペクトルが最大となる方位（ラジアン）
-                - Sv_rot: 速度応答スペクトルが最大となる方位（ラジアン）
-                - Sd_rot: 変位応答スペクトルが最大となる方位（ラジアン）
+                - **Sa**: 加速度応答スペクトル（h=5%)
+                - **Sv**: 速度応答スペクトル（h=5%)
+                - **Sd**: 変位応答スペクトル（h=5%)
+                - **Sa_rot**: 加速度応答スペクトルが最大となる方位（ラジアン）
+                - **Sv_rot**: 速度応答スペクトルが最大となる方位（ラジアン）
+                - **Sd_rot**: 変位応答スペクトルが最大となる方位（ラジアン）
         """
         self.period = np.logspace(-1,1,100)
 
@@ -947,6 +959,13 @@ class vectors(vector):
 
     #----------------------------------------------#
     def output(self,output_file,fmt="%15.7f"):
+        """
+            3成分（EW, NS, UD）の時刻歴波形を出力する
+
+        Args:
+            output_ffile (str): 出力先ファイル名
+            fmt (str,optional): 出力フォーマット
+        """
         header = str(self.header)
         output = np.c_[self.tim,self.ew,self.ns,self.ud]
         np.savetxt(output_file,output,fmt=fmt,header=header,comments="#")
