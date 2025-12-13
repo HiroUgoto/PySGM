@@ -7,16 +7,16 @@
 このモジュールには、データの読み込み関数と、波形を扱うための主要クラスが含まれています．
 ### Functions (関数)
 ::: PySGM.vector
-options:
-  members:
-    - parse
+    options:
+        members:
+             - parse
 
 ### Classes (クラス)
 ::: PySGM.vector
-options:
-  members:
-    - vector
-    - vectors
+    options:
+        members:
+            - vector
+            - vectors
 
 
 <!-- ::: PySGM.response
