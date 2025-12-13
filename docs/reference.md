@@ -8,18 +8,18 @@
 ### Functions (関数)
 ::: PySGM.vector.parse
     options: 
-        show_root_toc_entry: false
+        show_root_heading: true
         show_root_full_path: false
-
+        
 ### Classes (クラス)
 ::: PySGM.vector.vector
     options:
-        show_root_toc_entry: false
+        show_root_heading: true
         show_root_full_path: false
-
+        
 ::: PySGM.vector.vectors
     options:
-        show_root_toc_entry: false
+        show_root_heading: true
         show_root_full_path: false
 
 <!-- ::: PySGM.response
