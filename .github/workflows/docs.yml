@@ -1,0 +1,28 @@
+name: docs
+on:
+  push:
+    branches:
+      - master  
+      
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          # 依存ライブラリとドキュメント作成ツールをインストール
+          pip install numpy scipy matplotlib
+          pip install mkdocs-material mkdocstrings[python]
+
+      - name: Build and Deploy
+        run: mkdocs gh-deploy --force
