@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "PySGM-jp"
-version = "0.1.8.9"
+version = "0.1.9.0"
 authors = [
   { name="Hiroyuki Goto", email="goto@catfish.dpri.kyoto-u.ac.jp" },
 ]
@@ -23,6 +23,10 @@ dependencies = [
     "scipy>=1.7.0",
     "matplotlib>=3.4.0",
 ]
+
+[project.urls]
+Documentation = "https://hirougoto.github.io/PySGM/"
+Repository = "https://github.com/HiroUgoto/PySGM"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

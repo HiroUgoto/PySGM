@@ -1,7 +1,7 @@
 Metadata-Version: 2.4
 Name: PySGM-jp
-Version: 0.1.8.8
-Summary: PySGM 強震動データの解析ライブラリ
+Version: 0.1.8.9
+Summary: 強震動データの解析・処理用ライブラリ
 Author: Hiroyuki Goto
 Author-email: Hiroyuki Goto <goto@catfish.dpri.kyoto-u.ac.jp>
 Classifier: Programming Language :: Python :: 3
@@ -15,11 +15,11 @@ Requires-Dist: matplotlib>=3.4.0
 Dynamic: author
 Dynamic: requires-python
 
-# PySGM
+# PySGM-jp
 
 Python code to parse and analyze Strong Ground Motion records
 
-強震動データを読み込んで解析するPythonツール群
+強震動データを読み込んで解析・処理するPythonツール群
 
 
 ## Requirements
@@ -34,14 +34,12 @@ Python code to parse and analyze Strong Ground Motion records
 
 ## Install
 
-以下のように，pipでインストールできます（環境に応じて，pipコマンドやpip3コマンドを使ってください）
+以下のように，pipでインストールできます
 
 ```sh
-$ pip install git+https://github.com/HiroUgoto/PySGM
+$ pip install PySGM-jp
 ```
-```sh
-$ pip3 install git+https://github.com/HiroUgoto/PySGM
-```
+
 
 
 ## Usage

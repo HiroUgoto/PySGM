@@ -115,3 +115,7 @@ velocity.output_rs(output_rs_file_name) # 応答スペクトルが出力され�
 ```
 
 この他にも色々ありますが，省略します
+
+---
+
+Hiroyuki Goto (Kyoto University)

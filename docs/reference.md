@@ -2,8 +2,11 @@
 
 ## 波形データの読み込み
 ::: PySGM.main
+    options: 
+        show_root_heading: true
+        show_root_full_path: false
 
-## 波形解析 (vector.py)
+## 波形解析
 このモジュールには、データの読み込み関数と、波形を扱うための主要クラスが含まれています．
 ### Functions (関数)
 ::: PySGM.vector.parse
