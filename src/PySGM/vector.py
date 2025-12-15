@@ -636,8 +636,8 @@ class vectors(vector):
             3成分（EW, NS, UD）すべてに対して、フーリエ変換を用いて数値積分する．指定した周波数帯域（low - high）以外はカットされる．
 
         Args:
-            low (float,optional): 低域カットオフ周波数（Hz）．デフォルトは 0.2
-            high (float,optional): 高域カットオフ周波数（Hz）．デフォルトは 50
+            low (float): 低域カットオフ周波数（Hz）．デフォルトは 0.2
+            high (float): 高域カットオフ周波数（Hz）．デフォルトは 50
 
         Returns:
             なし（インスタンス内の self.ew, self.ns, self.ud が積分後の波形に更新される）
@@ -960,11 +960,11 @@ class vectors(vector):
     #----------------------------------------------#
     def output(self,output_file,fmt="%15.7f"):
         """
-            3成分（EW, NS, UD）の時刻歴波形を出力する
+            3成分（EW, NS, UD）の時刻歴波形をファイルに書き出すする
 
         Args:
             output_ffile (str): 出力先ファイル名
-            fmt (str,optional): 出力フォーマット
+            fmt (str): 出力フォーマット
         """
         header = str(self.header)
         output = np.c_[self.tim,self.ew,self.ns,self.ud]
@@ -1026,10 +1026,10 @@ class vectors(vector):
             3成分（EW, NS, UD）の時刻歴波形を一括してプロットします。
 
         Args:
-            start (float,optional): 表示の開始時刻（秒）
-            end (float,optional): 表示の終了時刻（秒）
-            to_end (bool,optional): 波形データの最後まで表示する場合はTrue
-            output_file (str,optional): 外部ファイルに画像として出力する場合は，ファイル名を指定する．ファイル名の拡張子に応じた形式で保存される．
+            start (float): 表示の開始時刻（秒）
+            end (float): 表示の終了時刻（秒）
+            to_end (bool): 波形データの最後まで表示する場合はTrue
+            output_file (str): 外部ファイルに画像として出力する場合は，ファイル名を指定する．ファイル名の拡張子に応じた形式で保存される．
         """
         if to_end:
             start = self.tim[0]
