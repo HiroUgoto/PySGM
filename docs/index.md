@@ -1,6 +1,6 @@
-# PySGM
+# PySGM-jp
 
-**PySGM** は、強震動データ（Strong Ground Motion）の読み込み、処理、および解析を行うための Python ライブラリです。
+**PySGM-jp** は、強震動データ（Strong Ground Motion）の読み込み、処理、および解析を行うための Python ライブラリです。
 
 ## 主な機能
 * 各種強震動データフォーマット（K-NET/KiK-net, 気象庁など）の読み込み
@@ -9,11 +9,10 @@
 
 ## インストール方法
 
-以下のように，pipでインストールできます（環境に応じて，pipコマンドやpip3コマンドを使ってください）
+以下のように，pipでインストールできます
 
-```bash
-# GitHubから最新版をインストール
-pip install git+https://github.com/HiroUgoto/PySGM
+```sh
+$ pip install PySGM-jp
 ```
 
 ## 使用方法（例）
