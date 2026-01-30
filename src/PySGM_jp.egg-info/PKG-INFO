@@ -1,9 +1,11 @@
 Metadata-Version: 2.4
 Name: PySGM-jp
-Version: 0.1.8.9
+Version: 0.1.9.0
 Summary: 強震動データの解析・処理用ライブラリ
 Author: Hiroyuki Goto
 Author-email: Hiroyuki Goto <goto@catfish.dpri.kyoto-u.ac.jp>
+Project-URL: Documentation, https://hirougoto.github.io/PySGM/
+Project-URL: Repository, https://github.com/HiroUgoto/PySGM
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
@@ -132,3 +134,7 @@ velocity.output_rs(output_rs_file_name) # 応答スペクトルが出力され�
 ```
 
 この他にも色々ありますが，省略します
+
+---
+
+Hiroyuki Goto (Kyoto University)
