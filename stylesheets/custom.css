@@ -1,0 +1,19 @@
+.doc-object.doc-function,
+.doc-object.doc-attribute {
+    border-bottom: 1px solid #cccccc !important; /* 少し濃いグレーの線 */
+    padding-bottom: 2em !important;
+    margin-bottom: 2em !important;
+}
+
+/* クラスの説明（属性テーブルなど）と、最初のメソッドの間に線を引く */
+.doc-object.doc-class > .doc-contents > .doc-children {
+    border-top: 1px solid #cccccc !important;
+    padding-top: 2em !important;
+    margin-top: 2em !important;
+}
+/* 一番最後の項目の下には線を引かない */
+.doc-object:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
