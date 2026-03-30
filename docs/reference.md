@@ -1,37 +1,21 @@
 # API Reference
 
 ## 波形データの読み込み
-::: PySGM.main
-    options: 
-        show_root_heading: true
-        show_root_full_path: false
+::: PySGM.main.parse
+    options:
+      show_root_heading: true
+      show_root_full_path: false
+      heading_level: 4
+      show_source: false
 
 ## 波形解析
-このモジュールには、データの読み込み関数と、波形を扱うための主要クラスが含まれています．
-### Functions (関数)
-::: PySGM.vector.parse
-    options: 
-        show_root_heading: true
-        show_root_full_path: false
-        
-### Classes (クラス)
-::: PySGM.vector.vector
-    options:
-        show_root_heading: true
-        show_root_full_path: false
-        
+vectorsオブジェクトには、波形を処理するための様々なメソッドが用意されています。
+
 ::: PySGM.vector.vectors
     options:
-        show_root_heading: true
-        show_root_full_path: false
-
-<!-- ::: PySGM.response
-::: PySGM.spectrum
-::: PySGM.jsi
-
-## Data Parse Module 
-::: PySGM.nied
-::: PySGM.jma
-::: PySGM.pari
-::: PySGM.ceorka -->
+      show_root_heading: true
+      show_root_full_path: false
+      heading_level: 3
+      show_source: false
+      show_bases: false
 

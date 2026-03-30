@@ -15,3 +15,6 @@ plugins:
 nav:
   - Home: index.md
   - Reference: reference.md
+
+extra_css:
+  - stylesheets/custom.css

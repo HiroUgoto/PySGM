@@ -17,16 +17,16 @@ from . import demand_curve
 #/ Parse function sets /#
 def parse(input_file,noheader=False):
     """
-        指定されたファイルを読み込み、3成分一括解析用の vectors オブジェクトを生成する
+        指定されたファイルを読み込み、3成分一括解析用の vectors オブジェクトを生成する。
 
-        この関数は内部で vectors.input を呼び出す．主に PySGM 独自のテキスト形式（vector形式）を読み込む際に使用する．
+        この関数は内部で vectors.input を呼び出す。主に PySGM 独自のテキスト形式（vector形式）を読み込む際に使用する。
 
     Args:
         input_file (str): 読み込むファイルのパス
-        noheader (bool): ファイルにヘッダー行がない場合は True を指定します
+        noheader (bool): ファイルにヘッダー行がない場合は True を指定する
 
     Returns:
-        vectors: 読み込まれたデータを持つ vectors クラスのインスタンス
+        (vectors): 読み込まれたデータを持つ vectors クラスのインスタンス
     """
     v = vectors.input(input_file,noheader)
     return v
@@ -45,14 +45,6 @@ class vector:
         dt (float): サンプリング間隔（秒）
     """
     def __init__(self,header,tim,wave):
-        """
-            vector クラスの初期化
-
-        Args:
-            header (dict): ヘッダー情報
-            tim (numpy.ndarray): 時間軸データ
-            wave (numpy.ndarray): 波形データ
-        """
         self.header = header
         self.tim = tim
         self.wave = wave
@@ -66,18 +58,6 @@ class vector:
     #  Wave Analysis
     #----------------------------------------------#
     def integration(wave,dt,low,high):
-        """
-            フーリエ変換を用いた数値積分
-
-        Args:
-            wave (numpy.ndarray): 積分対象の波形データ
-            dt (float): サンプリング間隔（秒）
-            low (float): 低域カットオフ周波数(Hz)
-            high (float): 高域カットオフ周波数(Hz)
-
-        Returns:
-            numpy.ndarray: 積分後の波形データ
-        """
         w = np.fft.fft(wave)
         freq = np.fft.fftfreq(len(wave),d=dt)
         df = freq[1] - freq[0]
@@ -393,7 +373,7 @@ class vector:
 #######################################
 class vectors(vector):
     """
-        3成分（EW, NS, UD）の強震動データを一括して管理・解析するためのクラス
+    3成分（EW, NS, UD）の強震動データを一括して管理・解析するためのクラス。
 
     Attributes:
         header (dict): 観測点情報や記録時間などを含むヘッダー
@@ -404,15 +384,6 @@ class vectors(vector):
         dt (float): サンプリング間隔（秒）
     """
     def __init__(self,header,tim,ew,ns,ud):
-        """vectors クラスの初期化
-
-        Args:
-            header (dict): ヘッダー情報
-            tim (numpy.ndarray): 時間軸データ
-            ew (numpy.ndarray): EW成分のデータ
-            ns (numpy.ndarray): NS成分のデータ
-            ud (numpy.ndarray): UD成分のデータ
-        """
         self.header = header
         self.tim = tim
         self.ew = ew
@@ -421,6 +392,12 @@ class vectors(vector):
         self.dt = tim[1] - tim[0]
 
     def copy(self):
+        """
+        vectorsオブジェクトのコピー。
+
+        Returns:
+            (vectors): コピーされた vectorsインスタンス
+        """
         v2 = copy.deepcopy(self)
         return v2
 
@@ -428,13 +405,14 @@ class vectors(vector):
     #  Construction functions
     #----------------------------------------------#
     def append(self,v):
-        """vectors オブジェクトを後ろに繋げる
+        """
+        vectorsオブジェクトを後ろに繋げる。
 
         Args:
-            v (vectors): 後ろに追加する vectors オブジェクト
+            v (vectors): 後ろに追加する vectorsオブジェクト
 
         Returns:
-            vectors: 後ろにvが追加された新しい vectors インスタンス
+            (vectors): 後ろにvが追加された新しい vectorsインスタンス
         """
         v2 = self
         v2.header = self.header
@@ -452,6 +430,15 @@ class vectors(vector):
         return v2
 
     def to_vector(self,comp):
+        """
+        指定した成分のvectorオブジェクト（一成分）を抽出する。
+
+        Args:
+            comp (string): 抽出する成分。"ew"，"ns"，"ud"のいずれかを指定する
+        
+        Returns:
+            (vector): 抽出された vectorインスタンス
+        """
         if comp == "ew":
             v = vector(self.header,self.tim,self.ew)
         elif comp == "ns":
@@ -465,10 +452,10 @@ class vectors(vector):
     #----------------------------------------------#
     def trend_removal(self,sec=None):
         """
-            3成分（EW, NS, UD）すべてに対して、線形トレンドの除去（基線補正）を一括適用する
+        3成分（EW, NS, UD）すべてに対して、線形トレンドの除去（基線補正）を一括適用する。
 
         Args:
-            なし
+            sec (float, optional): データ開始から指定した時刻（s）までのデータで基線補正をする（大振幅前のデータで基線補正したい場合に用いる）。デフォルトは全時刻のデータの平均値で基線補正をする。
 
         Returns:
             なし（インスタンス内の各成分が補正後の波形に更新される）
@@ -486,14 +473,14 @@ class vectors(vector):
 
     def rotation(self,rot,deg='deg'):
         """
-            水平2成分（EW, NS）を指定した角度だけ回転させる
+        水平2成分（EW, NS）を指定した角度だけ回転させた vectorsオブジェクトの生成。
 
         Args:
-            rot (float): 回転角
+            rot (float): 回転角（北から時計回りの角度）
             deg (str): 角度の単位。'deg'（度）または 'rad'（ラジアン）
 
         Returns:
-            vectors: 回転後の成分を持つ新しい vectors インスタンス
+            (vectors): 回転後の成分を持つ新しい vectorsインスタンス
         """
         if deg == 'deg':
             rad = rot/180.0 * math.pi
@@ -510,6 +497,17 @@ class vectors(vector):
         return v2
 
     def zero_padding(self,ntim):
+        """
+        ゼロ埋めされた vectorsオブジェクトの生成。
+
+        指定したデータ数となるよう、データをゼロで埋める。（例：6000サンプルのデータにntim=12000を指定した場合、6001-12000が0値である12000サンプルのデータとなる。）
+
+        Args:
+            ntim (int): 指定するデータ数。保持データの長さより短い場合には、短くしない。
+
+        Returns:
+            (vectors): ゼロ埋めされた新しい vectorsインスタンス
+        """
         self.trend_removal()
         ntim0 = len(self.tim)
 
@@ -532,6 +530,17 @@ class vectors(vector):
         return v2
 
     def time_shift(self,shift):
+        """
+        時間シフトさせた vectorsオブジェクトの生成。
+
+        指定した時間（秒）だけデータをずらす。（例：shift=15を指定した場合、元データの15秒の値が冒頭にくる。）なお刈り込みは行わないので、ずらしたデータはデータ後部に移動させただけであることに注意。
+
+        Args:
+            shift (float): シフトさせる時間（秒）
+
+        Returns:
+            (vectors): 時間シフトさせた新しい vectorsインスタンス
+        """
         nshift = int(shift/self.dt)
         v2 = copy.deepcopy(self)
         v2.ew = np.roll(self.ew,-nshift)
@@ -540,6 +549,17 @@ class vectors(vector):
         return v2
 
     def normalize(self,scale=1.0):
+        """
+        正規化された vectorsオブジェクトの生成。
+
+        最大振幅が1、あるいは指定した数値となるようにデータを規格化する。成分毎に正規化されることに注意。
+        
+        Args:
+            scale (float, optional): 正規化後の最大振幅。デフォルトは1。
+
+        Returns:
+            (vectors): 正規化された新しい vectorsインスタンス
+        """
         v2 = copy.deepcopy(self)
         v2.ew = vector.normalize(self.ew,scale)
         v2.ns = vector.normalize(self.ns,scale)
@@ -547,6 +567,15 @@ class vectors(vector):
         return v2
 
     def level_shift(self,level):
+        """
+        データに一律のスカラー値を加えた vectorsオブジェクトの生成。
+        
+        Args:
+            level (float): データに加えるスカラー値
+
+        Returns:
+            (vectors): 新しい vectorsインスタンス
+        """
         v2 = copy.deepcopy(self)
         v2.ew = self.ew + level
         v2.ns = self.ns + level
@@ -554,6 +583,15 @@ class vectors(vector):
         return v2
 
     def trim(self,ntim):
+        """
+        指定したデータ数にトリミングした vectorsオブジェクトの生成。
+
+        Args:
+            ntim (int): 先頭からntimのデータ数までを残して、後続のデータを削除する
+
+        Returns:
+            (vectors): 新しい vectorsインスタンス
+        """
         v2 = copy.deepcopy(self)
         v2.ew = self.ew[0:ntim]
         v2.ns = self.ns[0:ntim]
@@ -564,6 +602,17 @@ class vectors(vector):
         return v2
 
     def adjust(self,v):
+        """
+        指定したvectorsオブジェクトと同じデータ数となるよう整形した vectorsオブジェクトの生成。
+
+        指定のvectorsオブジェクトの方がデータが長い場合は、同じデータ数となるまでゼロ埋めをする（zero_padding）。データが短い場合は、同じデータ数となるまでトリミングする（trim）。
+        
+        Args:
+            v (vectors): データ長を参照するための vectorsオブジェクト
+
+        Returns:
+            (vectors): 整形された新しい vectorsインスタンス
+        """
         ntim = v.header['ntim']
 
         if self.header['ntim'] > ntim:
@@ -574,6 +623,15 @@ class vectors(vector):
         return v2
 
     def every(self,n):
+        """
+        指定したサンプル数毎に間引いた vectorsオブジェクトの生成。
+
+        Args:
+            n (int): 間引くデータ数。n個飛ばしのデータが生成される。
+
+        Returns:
+            (vectors): 間引き処理後の新しい vectorsインスタンス
+        """
         v2 = copy.deepcopy(self)
         v2.ew = self.ew[0::n]
         v2.ns = self.ns[0::n]
@@ -594,6 +652,15 @@ class vectors(vector):
         return v2
 
     def amplify(self,amp):
+        """
+        振幅倍率を変更した vectorsオブジェクトの生成。
+
+        Args:
+            amp (float): 振幅の倍率
+
+        Returns:
+            (vectors): 新しい vectorsインスタンス
+        """
         v2 = copy.deepcopy(self)
         v2.ew = self.ew*amp
         v2.ns = self.ns*amp
@@ -601,6 +668,17 @@ class vectors(vector):
         return v2
 
     def extract(self,start,end=60,to_end=True):
+        """
+        指定した時間区間の vectorsオブジェクトを抽出する。
+
+        Args:
+            start (float): 抽出時間の開始時刻
+            end (float, optional): 抽出時間の終了時刻
+            to_end (bool, optional): 最後まで抽出する場合はTrue。endで指定した時刻で切り取る場合はFalse。endとto_end=Trueを指定した場合はto_endが優先される。
+
+        Returns:
+            (vectors): 抽出された新しい vectorsインスタンス
+        """
         ns = int(start/self.dt)
         if to_end:
             ne = self.header['ntim']
@@ -617,12 +695,34 @@ class vectors(vector):
         return v2
 
     def reset_tim(self):
+        """
+        時刻のリセット。
+
+        extractなどの処理では内部変数timの基準時刻が変化しない。基準時刻をデータの先頭にしたい場合に使用する。
+
+        Args:
+            なし
+
+        Returns:
+            なし（開始時刻が0秒となる）
+        """
         t0 = self.tim[0]
         self.tim = self.tim - t0
         self.header['ntim'] = len(self.tim)
 
     #----------------------------------------------#
     def set_origin_time(self,origin_time_str):
+        """
+        基準時刻を指定する。
+        
+        指定した時刻が基準時刻（timの0秒）となるように、timのみが更新される。波形データは修正されない（trimingやzero_paddingされない）。
+
+        Args:
+            origin_time_str (str): 設定する基準時刻。"%Y/%m/%d %H:%M:%S"のフォーマットで記述する。（例：2018/06/18 07:58:00）
+        
+        Returns:
+            なし（timの基準時刻が指定した時刻となる。波形データは修正されない。）
+        """
         origin_time = datetime.datetime.strptime(origin_time_str,"%Y/%m/%d %H:%M:%S")
         record_time = datetime.datetime.strptime(self.header['record_time'],"%Y/%m/%d %H:%M:%S")
         dt = record_time - origin_time
@@ -633,14 +733,14 @@ class vectors(vector):
     #----------------------------------------------#
     def integration(self,low=0.2,high=50):
         """
-            3成分（EW, NS, UD）すべてに対して、フーリエ変換を用いて数値積分する．指定した周波数帯域（low - high）以外はカットされる．
+        3成分（EW, NS, UD）すべてに対して、フーリエ変換を用いて数値積分する。指定した周波数帯域（low - high）以外はカットされる。
 
         Args:
-            low (float): 低域カットオフ周波数（Hz）．デフォルトは 0.2
-            high (float): 高域カットオフ周波数（Hz）．デフォルトは 50
+            low (float, optional): 低域カットオフ周波数（Hz）
+            high (float, optional): 高域カットオフ周波数（Hz）
 
         Returns:
-            なし（インスタンス内の self.ew, self.ns, self.ud が積分後の波形に更新される）
+            (vectors): 積分によって生成された新しい vectorsインスタンス
         """
         v2 = copy.deepcopy(self)
         v2.ew = vector.integration(self.ew,self.dt,low,high)
@@ -650,6 +750,16 @@ class vectors(vector):
         return v2
 
     def differentiation(self,low=0.05,high=50):
+        """
+        3成分（EW, NS, UD）すべてに対して、フーリエ変換を用いて数値微分する。指定した周波数帯域（low - high）以外はカットされる。
+
+        Args:
+            low (float, optional): 低域カットオフ周波数（Hz）
+            high (float, optional): 高域カットオフ周波数（Hz）
+
+        Returns:
+            (vectors): 微分によって生成された新しい vectorsインスタンス
+        """
         v2 = copy.deepcopy(self)
         v2.ew = vector.differentiation(self.ew,self.dt,low,high)
         v2.ns = vector.differentiation(self.ns,self.dt,low,high)
@@ -659,14 +769,14 @@ class vectors(vector):
 
     def bandpass(self,low=0.05,high=10):
         """
-            3成分（EW, NS, UD）すべてに対して、バンドパスフィルタを一括適用する
+        3成分（EW, NS, UD）すべてに対して、バンドパスフィルタを一括適用する。
 
         Args:
-            low (float): 低域カットオフ周波数（Hz）
-            high (float): 高域カットオフ周波数（Hz）
+            low (float, optional): 低域カットオフ周波数（Hz）
+            high (float, optional): 高域カットオフ周波数（Hz）
 
         Returns:
-            なし（インスタンス内の各成分がフィルタ適用後の波形に更新される）
+            (vectors): フィルターが適用された新しい vectorsインスタンス
         """
         v2 = copy.deepcopy(self)
         v2.ew = vector.bandpass(self.ew,self.dt,low,high)
@@ -698,6 +808,15 @@ class vectors(vector):
         return v2
 
     def envelope(self):
+        """
+        3成分（EW, NS, UD）すべてに対して、包絡線を求める。
+
+        Args:
+            なし
+
+        Returns:
+            (vectors): 包絡線が格納された vectorsインスタンス
+        """
         v2 = copy.deepcopy(self)
         v2.ew = vector.envelope_vector(self.ew)
         v2.ns = vector.envelope_vector(self.ns)
@@ -755,16 +874,16 @@ class vectors(vector):
 
     def response_spectrum_max(self):
         """
-            水平成分の応答スペクトルをRotD100で算出する．実行するとvectorsオブジェクトに以下のAttributesが追加される．
-
+        水平成分の応答スペクトルをRotD100で算出する。実行するとvectorsオブジェクトにAttributesが追加される。
+        **Sa**: 加速度応答スペクトル（h=5%)。
+        **Sv**: 速度応答スペクトル（h=5%)。
+        **Sd**: 変位応答スペクトル（h=5%)。
+        **Sa_rot**: 加速度応答スペクトルが最大となる方位（ラジアン）。
+        **Sv_rot**: 速度応答スペクトルが最大となる方位（ラジアン）。
+        **Sd_rot**: 変位応答スペクトルが最大となる方位（ラジアン）。
+        
         Returns:
-            None: このメソッドは値を返さない．代わりに以下の属性が追加される．
-                - **Sa**: 加速度応答スペクトル（h=5%)
-                - **Sv**: 速度応答スペクトル（h=5%)
-                - **Sd**: 変位応答スペクトル（h=5%)
-                - **Sa_rot**: 加速度応答スペクトルが最大となる方位（ラジアン）
-                - **Sv_rot**: 速度応答スペクトルが最大となる方位（ラジアン）
-                - **Sd_rot**: 変位応答スペクトルが最大となる方位（ラジアン）
+            このメソッドは値を返さない。代わりに属性(Sa, Sv, Sd, Sa_rot, Sv_rot, Sd_rot)が追加される。
         """
         self.period = np.logspace(-1,1,100)
 
@@ -788,13 +907,13 @@ class vectors(vector):
 
     def peak_ground_3d(self,print_result=True):
         """
-            3成分合成波の最大値（PGAやPGV）を算出する
+        3成分合成波の最大値（PGAやPGV）を算出する。
 
         Args:
-            print_result (bool): 結果を表示するかどうか
+            print_result (bool, optional): 結果を表示するかどうか
 
         Returns:
-            float: 最大値
+            (float): 最大値
         """
         PG = math.sqrt(np.max(self.ew**2 + self.ns**2 + self.ud**2))
 
@@ -805,13 +924,13 @@ class vectors(vector):
 
     def peak_ground_2d(self,print_result=True):
         """
-            水平2成分合成波の最大値（PGAやPGV）を算出する
+        水平2成分合成波の最大値（PGAやPGV）を算出する。
 
         Args:
-            print_result (bool): 結果を表示するかどうか
+            print_result (bool, optional): 結果を表示するかどうか
 
         Returns:
-            float: 最大値
+            (float): 最大値
         """
         PG = math.sqrt(np.max(self.ew**2 + self.ns**2))
 
@@ -834,13 +953,13 @@ class vectors(vector):
 
     def jma_seismic_intensity(self,print_result=True):
         """
-            気象庁計測震度を計算
+            気象庁計測震度を計算する。
 
         Args:
-            print_result (bool,optional): 結果をコンソールに表示する場合はTrue
+            print_result (bool, optional): 結果をコンソールに表示する場合はTrue
 
         Returns:
-            float: 計算された計測震度値
+            (float): 計算された計測震度値
         """
         si = jsi.jsi(self.ew,self.ns,self.ud,self.dt)
 
@@ -960,10 +1079,10 @@ class vectors(vector):
     #----------------------------------------------#
     def output(self,output_file,fmt="%15.7f"):
         """
-            3成分（EW, NS, UD）の時刻歴波形をファイルに書き出すする
+            3成分（EW, NS, UD）の時刻歴波形をファイルに出力する。
 
         Args:
-            output_ffile (str): 出力先ファイル名
+            output_file (str): 出力先ファイル名
             fmt (str): 出力フォーマット
         """
         header = str(self.header)
@@ -971,6 +1090,13 @@ class vectors(vector):
         np.savetxt(output_file,output,fmt=fmt,header=header,comments="#")
 
     def output_csv(self,output_file,fmt="%15.7f"):
+        """
+            3成分（EW, NS, UD）の時刻歴波形をCSV形式でファイルに出力する。
+
+        Args:
+            output_file (str): 出力先ファイル名
+            fmt (str): 出力フォーマット
+        """
         header = ["{}: {}".format(key,self.header[key]) for key in self.header.keys()]
         output = np.c_[self.tim,self.ew,self.ns,self.ud]
         with open(output_file,'w') as f:
@@ -980,6 +1106,12 @@ class vectors(vector):
             writer.writerows(output)
 
     def output_pickle(self,output_file):
+        """
+            vectorsオブジェクトをpickle形式（バイナリ）でファイルに出力する。
+
+        Args:
+            output_file (str): 出力先ファイル名
+        """
         with open(output_file,'wb') as f:
             pickle.dump(self,f)
 
@@ -1023,13 +1155,13 @@ class vectors(vector):
     #----------------------------------------------#
     def plot_all(self,start=0,end=60,to_end=False,output_file=None):
         """
-            3成分（EW, NS, UD）の時刻歴波形を一括してプロットします。
+            3成分（EW, NS, UD）の時刻歴波形を一括してプロットする。
 
         Args:
             start (float): 表示の開始時刻（秒）
-            end (float): 表示の終了時刻（秒）
-            to_end (bool): 波形データの最後まで表示する場合はTrue
-            output_file (str): 外部ファイルに画像として出力する場合は，ファイル名を指定する．ファイル名の拡張子に応じた形式で保存される．
+            end (float, optional): 表示の終了時刻（秒）
+            to_end (bool, optional): 波形データの最後まで表示する場合はTrue。endとto_end=Trueの両方が指定された場合は、to_endが優先される。
+            output_file (str, optional): 外部ファイルに画像として出力する場合はファイル名を指定する。ファイル名の拡張子に応じた形式で保存される。
         """
         if to_end:
             start = self.tim[0]

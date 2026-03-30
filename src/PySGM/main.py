@@ -8,19 +8,22 @@ import pickle
 
 def parse(file_name,file_name2=None,file_name3=None,fmt="vector",
     gain=None,bit=None,noheader=False):
-    """強震動データを読み込み、適切な形式で読み込みます。
+    """
+    強震動データを読み込み、vectorsオブジェクトとしてパースします。
 
+    fmtに指定したフォーマットに応じて適切に変換します。例えば，防災科研K-NET/KiK-netの場合、fmt="nied"と指定すれば拡張子に応じて自動的に変換される。
+    
     Args:
-        file_name (str): 読み込むファイルのパス
-        file_name2 (str, optional): 追加のファイルパス（SAC形式用など）．ほとんどの場合は不要
-        file_name3 (str, optional): 追加のファイルパス（SAC形式用など）．ほとんどの場合は不要
-        fmt (str, optional): データのフォーマット ("vector", "nied", "jma", "win", "gns", "sac")．デフォルトはvecotrs形式（"vector"）
+        file_name (str): 読み込むファイルのパス（K-NET/KiK-netの場合はEWファイル名を指定すること。"~~~~.EW"，"~~~~~.EW2"など）
+        file_name2 (str, optional): 追加のファイルパス（SAC形式用など）。ほとんどの場合は不要。
+        file_name3 (str, optional): 追加のファイルパス（SAC形式用など）。ほとんどの場合は不要。
+        fmt (str, optional): データのフォーマット ("vector", "nied", "jma", "win", "sac")
         gain (float, optional): 振幅倍率（win形式のみ）
         bit (int, optional): データビット数（win形式のみ）
         noheader (bool, optional): ヘッダーがあるかどうか（vectors形式のみ）
 
     Returns:
-        vectors: 読み込まれたデータの vectors オブジェクト
+        (vectors): 読み込まれたデータの vectorsインスタンス
     """
     if fmt == "vector":
         v = vector.parse(file_name,noheader)
